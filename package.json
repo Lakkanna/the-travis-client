@@ -1,0 +1,69 @@
+{
+	"name": "the-travis-client",
+	"displayName": "The Travis Client",
+	"publisher": "Lakkannawalikar",
+	"description": "Extension to interact with travis build status, PR generator and PR merger",
+	"version": "0.0.1",
+	"engines": {
+		"vscode": "^1.34.0"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Lakkanna/the-travis-client.git"
+	},
+	"icon": "images/icon.png",
+	"galleryBanner": {
+		"color": "#2d2d2d",
+		"theme": "dark"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onCommand:extension.theTravisClient"
+	],
+	"main": "./out/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "extension.theTravisClient",
+				"title": "The Travis Client"
+			}
+		],
+		"configuration":[
+			{
+				"title": "The Travis Client",
+				"properties": {
+					"theTravisClient.autoRefresh": {
+						"type": "boolean",
+						"default": true,
+						"description": "Auto refresh"
+					}
+				}
+			}
+		],
+		"keybindings":[
+			{
+				"command": "extension.theTravisClient",
+				"key": "shift+cmd+t",
+				"mac": "shift+cmd+t",
+				"win": "shift+ctrl+t",
+				"linux": "shift+ctrl+t"
+			}
+		]
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"postinstall": "node ./node_modules/vscode/bin/install",
+		"test": "npm run compile && node ./node_modules/vscode/bin/test"
+	},
+	"devDependencies": {
+		"typescript": "^3.3.1",
+		"vscode": "^1.1.28",
+		"tslint": "^5.12.1",
+		"@types/node": "^10.12.21",
+		"@types/mocha": "^2.2.42"
+	}
+}
