@@ -8,7 +8,14 @@ export default class ActiveRepository {
   private _activeBranch = '';
 
   constructor(private path: string) {
-    [this._username, this._repositoryName] = this.setRepositoryDetails();
+    const owner = vscode.workspace.getConfiguration('travisClient').get<string>('owner');
+    if (_.isEmpty(owner)) {
+      [this._username, this._repositoryName] = this.setRepositoryDetails();
+    } else {
+      [this._username, this._repositoryName] = this.setRepositoryDetails();
+      this._username = owner || "";
+    }
+
     this.getActiveBranch();
   }
 
