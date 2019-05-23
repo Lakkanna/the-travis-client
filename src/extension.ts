@@ -1,26 +1,87 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import request = require('request');
+import * as _ from 'lodash';
+import { RepoNodeProvider } from './nodes/nodeProvider';
+import ActiveRepository from './common/ActiveRepository';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+const repoURL = 'https://api.travis-ci.org/owner/Lakkanna/repos';
+
 export function activate(context: vscode.ExtensionContext) {
-
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-		console.log('Congratulations, your extension "the-travis-client" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
+	let ActiveRepositoryInstance: any;
 	let disposable = vscode.commands.registerCommand('extension.theTravisClient', () => {
-		// The code you place here will be executed every time your command is executed
-
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World!');
+		if (vscode.workspace.rootPath) {
+			ActiveRepositoryInstance = new ActiveRepository(vscode.workspace.rootPath);
+			console.log(ActiveRepositoryInstance.branch);
+		}
+		let finalData: any = {};
+		const token = vscode.workspace.getConfiguration('travisClient')['github_oauth_token'];
+		const headers = {
+			"Travis-API-Version": "3",
+			"User-Agent": "API Explorer",
+			"Authorization": `token ${token}`
+		};
+		request({
+			headers: headers,
+			uri: repoURL,
+			method: 'GET'
+		}, (err, res, body) => {
+			//it works!
+			if (err) {
+				console.error(err);
+			}
+			const repositories = JSON.parse(body).repositories;
+			
+			repositories.forEach((rep: any) => {
+				const branchesURL = `https://api.travis-ci.org/repo/${rep.id}/branches`;
+				request({
+					headers: headers,
+					uri: branchesURL,
+					method: 'GET'
+				}, (err2, res2, body2) => {
+					if (err2) {
+						console.error(err2);
+					}
+					const branchs = JSON.parse(body2).branches;
+					//finalData.push({[rep.name]: branchs});
+					if (res2.statusCode === 200) {
+						branchs.forEach((br: any) => {
+							const branchBuildsURL = `https://api.travis-ci.org/repo/${rep.id}/builds?branch.name=${br.name}`;
+							request({
+								headers: headers,
+								uri: branchBuildsURL,
+								method: 'GET'
+							}, (err3, res3, body3) => {
+								if (err3) {
+									console.error(err3);
+								}
+								if (res3.statusCode === 200) {
+									const builds = JSON.parse(body3).builds;
+									let exitstingRepo: any = _.get(finalData, [rep.name]);
+									if (exitstingRepo) {
+										exitstingRepo[rep.name].push({ name: br.name, state: br.state ? rep.state : '', [br.name]: builds });
+									} else {
+										finalData[rep.name] = {name: rep.name, [rep.name]: [{ name: br.name, state: br.state ? rep.state : '', [br.name]: builds }]};
+									}
+									// actuall view creating, calling after getting required data
+									vscode.window.registerTreeDataProvider('repositories', new RepoNodeProvider(finalData, ActiveRepositoryInstance));
+								}
+							});
+						});
+					}
+				});
+			});
+		});
 	});
-
+	const repoPush = vscode.commands.registerCommand('the-travis-client.pushrepositories', function () {
+		console.log("Push repositories");
+	});
+	const remoteBranch = vscode.commands.registerCommand('the-travis-client.openBranchesInRemote', function() {
+		console.log("openBranchesInRemote");
+	});
 	context.subscriptions.push(disposable);
+	context.subscriptions.push(repoPush);
+	context.subscriptions.push(remoteBranch);
+	vscode.commands.executeCommand('extension.theTravisClient');
 }
 
 // this method is called when your extension is deactivated

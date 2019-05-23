@@ -1,5 +1,5 @@
-# the-travis-client README
-
+# The Travis Client
+![build](https://travis-ci.org/Lakkanna/the-travis-client.svg?branch=master)
 This is the README for your extension "the-travis-client". After writing up a brief description, we recommend including the following sections.
 
 ## Features
