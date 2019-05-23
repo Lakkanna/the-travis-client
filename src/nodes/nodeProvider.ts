@@ -55,6 +55,8 @@ export class RepoNodeProvider implements vscode.TreeDataProvider<Dependency> {
 							let duration = Math.round(_.get(branch, "duration")  / 60).toString();
 							duration += (duration === '1') ? ' minute' : ' minutes';
 							timeInfo = duration;
+						} else if (branch.state === 'created') {
+							timeInfo = 'Recently created';
 						} else {
 							timeInfo = _.replace(time, /[\/]/g, "-");
 						}
@@ -62,13 +64,14 @@ export class RepoNodeProvider implements vscode.TreeDataProvider<Dependency> {
 					return new Dependency(
 						branch.name ? branch.name : timeInfo,
 						branch.state,
+						_.get(branch, "id", branch.name),
 						branch,
 						branch.name ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None
 					);
 				});
 			} else {
 				return _.map(_.keys(data), (key) => {
-					return new Dependency(key, data[key].state, data[key], vscode.TreeItemCollapsibleState.Collapsed);
+					return new Dependency(key, data[key].state, data[key].id ? data[key].id : key, data[key], vscode.TreeItemCollapsibleState.Collapsed);
 				});
 				//return [new Dependency(data.name, data.state, data, vscode.TreeItemCollapsibleState.Collapsed)];
 			}
@@ -83,6 +86,7 @@ export class Dependency extends vscode.TreeItem {
 	constructor(
 		public readonly label: string,
 		private state: string,
+		private buildId: string,
 		public prevData: any,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		public readonly command?: vscode.Command
@@ -92,9 +96,9 @@ export class Dependency extends vscode.TreeItem {
 
 	get tooltip(): string {
 		if (this.state) {
-			return `${this.label}-${this.state}`;
+			return `${this.buildId}-${this.state}`;
 		} else {
-			return `${this.label}`;
+			return `${this.buildId}`;
 		}
 	}
 
@@ -113,6 +117,11 @@ export class Dependency extends vscode.TreeItem {
 					dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'clock.svg'),
 					light: path.join(__filename, '..', '..', '..', 'images', 'color', 'clock.svg'),
 				};
+			case 'created':
+						return {
+							dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'plus.svg'),
+							light: path.join(__filename, '..', '..', '..', 'images', 'color', 'plus.svg'),
+						};
 			case 'running':
 				return {
 					dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'clock.svg'),

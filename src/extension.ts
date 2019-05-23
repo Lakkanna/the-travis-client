@@ -72,15 +72,12 @@ export function activate(context: vscode.ExtensionContext) {
 			});
 		});
 	});
-	const repoPush = vscode.commands.registerCommand('the-travis-client.pushrepositories', function () {
-		console.log("Push repositories");
-	});
-	const remoteBranch = vscode.commands.registerCommand('the-travis-client.openBranchesInRemote', function() {
-		console.log("openBranchesInRemote");
+	const refresh = vscode.commands.registerCommand('theTravisClient.refresh', function () {
+		console.log("Refreshing travis status...");
+		vscode.commands.executeCommand('extension.theTravisClient');
 	});
 	context.subscriptions.push(disposable);
-	context.subscriptions.push(repoPush);
-	context.subscriptions.push(remoteBranch);
+	context.subscriptions.push(refresh);
 	vscode.commands.executeCommand('extension.theTravisClient');
 }
 

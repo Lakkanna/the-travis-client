@@ -43,12 +43,6 @@
 					"id": "pullrequests",
 					"name": "Pull Requests"
 				}
-			],
-			"explorer": [
-				{
-					"id": "testView",
-					"name": "Test View"
-				}
 			]
 		},
 		"commands": [
@@ -57,41 +51,19 @@
 				"title": "Travis Client: The Travis Client"
 			},
 			{
-				"command": "testView.reveal",
-				"title": "Travis Client: Test View: Reveal"
-			},
-			{
-				"command": "the-travis-client.openBranchesInRemote",
-				"title": "Travis Client: Open Branches on Remote",
-				"category": "The Travis Client",
+				"command": "theTravisClient.refresh",
+				"title": "Travis Client: Refresh",
 				"icon": {
-					"dark": "images/dep.svg",
-					"light": "images/dep.svg"
-				}
-			},
-			{
-				"command": "the-travis-client.pushRepositories",
-				"title": "Travis Client: Push Repositories",
-				"category": "Push repo",
-				"icon": {
-					"dark": "images/dep.svg",
-					"light": "images/dep.svg"
+					"light": "images/light/refresh.svg",
+					"dark": "images/dark/refresh.svg"
 				}
 			}
 		],
 		"menus": {
 			"view/title": [
 				{
-					"command": "the-travis-client.pushRepositories",
-					"when": "",
-					"group": "inline"
-				}
-			],
-			"view/item/context": [
-				{
-					"command": "the-travis-client.openBranchesInRemote",
-					"when": "view == branches && viewItem == dependency",
-					"group": "inline"
+					"command": "theTravisClient.refresh",
+					"group": "navigation"
 				}
 			]
 		},
@@ -106,20 +78,10 @@
 						],
 						"description": "List of branches to get build status"
 					},
-					"travisClient.autoRefresh": {
-						"type": "boolean",
-						"default": true,
-						"description": "Auto refresh"
-					},
 					"travisClient.username": {
 						"type": "string",
 						"default": "",
 						"description": "Travis username for the project"
-					},
-					"travisClient.repository": {
-						"type": "string",
-						"default": "",
-						"description": "Travis repository name for the project"
 					},
 					"travisClient.pro": {
 						"type": "boolean",
@@ -130,26 +92,6 @@
 						"type": "string",
 						"default": "",
 						"description": "Travis pro github token for authentication"
-					},
-					"travisClient.github_user": {
-						"type": "string",
-						"default": "",
-						"description": "Travis pro github user for authentication"
-					},
-					"travisClient.github_password": {
-						"type": "string",
-						"default": "",
-						"description": "Travis pro github password for authentication"
-					},
-					"travisClient.statusPolling": {
-						"type": "boolean",
-						"default": true,
-						"description": "Whether build status should be polled"
-					},
-					"travisClient.statusPollingInterval": {
-						"type": "number",
-						"default": 60,
-						"description": "Number of seconds between status polling requests"
 					}
 				}
 			}
