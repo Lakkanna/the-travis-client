@@ -1,26 +1,90 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import request = require('request');
+import * as _ from 'lodash';
+import { RepoNodeProvider } from './nodes/nodeProvider';
+import ActiveRepository from './common/ActiveRepository';
+import { repositoryURLTemplate, branchesURLTemplate, buildsURLTemplate } from './common/apiTemplates';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-		console.log('Congratulations, your extension "the-travis-client" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
+	let ActiveRepositoryInstance: any;
 	let disposable = vscode.commands.registerCommand('extension.theTravisClient', () => {
-		// The code you place here will be executed every time your command is executed
+		if (vscode.workspace.rootPath) {
+			ActiveRepositoryInstance = new ActiveRepository(vscode.workspace.rootPath);
 
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World!');
+			let finalData: any = {};
+			const token = vscode.workspace.getConfiguration('travisClient')['github_oauth_token'];
+			const headers = {
+				"Travis-API-Version": "3",
+				"User-Agent": "API Explorer",
+				"Authorization": `token ${token}`
+			};
+
+			request({
+				headers: headers,
+				uri: repositoryURLTemplate({'base': 'org', 'owner': ActiveRepositoryInstance.username}),
+				method: 'GET'
+			}, (err, res, body) => {
+				if (err) {
+					console.error(err);
+				}
+				const repositories = JSON.parse(body).repositories;
+				
+				repositories.forEach((rep: any) => {
+
+					request({
+						headers: headers,
+						uri: branchesURLTemplate({'base': 'org', 'repoId': rep.id}),
+						method: 'GET'
+					}, (err2, res2, body2) => {
+						if (err2) {
+							console.error(err2);
+						}
+						const branchs = JSON.parse(body2).branches;
+
+						if (res2.statusCode === 200) {
+							branchs.forEach((br: any) => {
+
+								request({
+									headers: headers,
+									uri: buildsURLTemplate({'base': 'org', 'repoId': rep.id, 'branch': br.name}),
+									method: 'GET'
+								}, (err3, res3, body3) => {
+									if (err3) {
+										console.error(err3);
+									}
+									if (res3.statusCode === 200) {
+										const builds = JSON.parse(body3).builds;
+										let exitstingRepo: any = _.get(finalData, [rep.name]);
+										if (exitstingRepo) {
+											exitstingRepo[rep.name].push({
+												name: br.name, active: ActiveRepositoryInstance.branch === br.name,
+												state: br.state ? rep.state : 'branch', [br.name]: builds
+											});
+										} else {
+											finalData[rep.name] = {
+												name: rep.name, active: ActiveRepositoryInstance.repository === rep.name,
+												state: 'repository', [rep.name]: [{ name: br.name, active: ActiveRepositoryInstance.branch === br.name,
+													state: br.state ? br.state : 'branch', [br.name]: builds
+												}]
+											};
+										}
+										// actuall view creating, calling after getting required data
+										vscode.window.registerTreeDataProvider('repositories', new RepoNodeProvider(finalData, ActiveRepositoryInstance));
+									}
+								});
+							});
+						}
+					});
+				});
+			});
+		}
 	});
-
+	const refresh = vscode.commands.registerCommand('theTravisClient.refresh', function () {
+		vscode.commands.executeCommand('extension.theTravisClient');
+	});
 	context.subscriptions.push(disposable);
+	context.subscriptions.push(refresh);
+	vscode.commands.executeCommand('extension.theTravisClient');
 }
 
 // this method is called when your extension is deactivated

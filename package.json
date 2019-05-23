@@ -20,29 +20,83 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.theTravisClient"
+		"*"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "the-travis-client",
+					"title": "The Travis Client",
+					"icon": "images/travis-activitybar-icon.svg"
+				}
+			]
+		},
+		"views": {
+			"the-travis-client": [
+				{
+					"id": "repositories",
+					"name": "Repositories"
+				},
+				{
+					"id": "pullrequests",
+					"name": "Pull Requests"
+				}
+			]
+		},
 		"commands": [
 			{
 				"command": "extension.theTravisClient",
-				"title": "The Travis Client"
+				"title": "Travis Client: The Travis Client"
+			},
+			{
+				"command": "theTravisClient.refresh",
+				"title": "Travis Client: Refresh",
+				"icon": {
+					"light": "images/light/refresh.svg",
+					"dark": "images/dark/refresh.svg"
+				}
 			}
 		],
-		"configuration":[
+		"menus": {
+			"view/title": [
+				{
+					"command": "theTravisClient.refresh",
+					"group": "navigation"
+				}
+			]
+		},
+		"configuration": [
 			{
 				"title": "The Travis Client",
 				"properties": {
-					"theTravisClient.autoRefresh": {
+					"travisClient.branches": {
+						"type": "array",
+						"default": [
+							"master"
+						],
+						"description": "List of branches to get build status"
+					},
+					"travisClient.username": {
+						"type": "string",
+						"default": "",
+						"description": "Travis username for the project"
+					},
+					"travisClient.pro": {
 						"type": "boolean",
-						"default": true,
-						"description": "Auto refresh"
+						"default": false,
+						"description": "Travis use pro or community"
+					},
+					"travisClient.github_oauth_token": {
+						"type": "string",
+						"default": "",
+						"description": "Travis pro github token for authentication"
 					}
 				}
 			}
 		],
-		"keybindings":[
+		"keybindings": [
 			{
 				"command": "extension.theTravisClient",
 				"key": "shift+cmd+t",
@@ -60,10 +114,17 @@
 		"test": "npm run compile && node ./node_modules/vscode/bin/test"
 	},
 	"devDependencies": {
-		"typescript": "^3.3.1",
-		"vscode": "^1.1.28",
-		"tslint": "^5.12.1",
+		"@types/lodash": "4.14.130",
+		"@types/mocha": "^2.2.42",
 		"@types/node": "^10.12.21",
-		"@types/mocha": "^2.2.42"
+		"@types/request": "2.48.1",
+		"lodash": "4.17.11",
+		"tslint": "^5.12.1",
+		"typescript": "^3.3.1",
+		"vscode": "^1.1.28"
+	},
+	"dependencies": {
+		"git-rev-2": "0.1.0",
+		"request": "2.88.0"
 	}
 }
