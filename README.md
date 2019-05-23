@@ -31,7 +31,7 @@ Extension requires three settings
 
 Copy **api-token**, you need it once after installing extension, you'll see pop-up paste there.
 
-**_Note_**: By miss if you missed pasting api-token, you can add it again by clicking on ![gear](images/light/gear.svg) which shows on REPOSITORIES title or you can run using command pallette `Shift + CMD + P` -> search for `Travis Client: Set token` and hit enter.
+**_Note_**: By miss if you missed pasting api-token, you can add it again by clicking on **_Gear_** icon which shows on REPOSITORIES title or you can run using command pallette `Shift + CMD + P` -> search for `Travis Client: Set token` and hit enter.
 
 This extension contributes the following settings:
 
@@ -53,6 +53,7 @@ For example:
 
 
 -----------------------------------------------------------------------------------------------------------
+
 
 ![feature 1](images/demo1.png)
 
