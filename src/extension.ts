@@ -69,7 +69,7 @@ export function activate(context: vscode.ExtensionContext) {
 											};
 										}
 										// actuall view creating, calling after getting required data
-										vscode.window.registerTreeDataProvider('repositories', new RepoNodeProvider(finalData, ActiveRepositoryInstance));
+										vscode.window.registerTreeDataProvider('repositories', new RepoNodeProvider(finalData));
 									}
 								});
 							});

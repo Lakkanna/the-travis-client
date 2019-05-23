@@ -6,7 +6,7 @@ export class RepoNodeProvider implements vscode.TreeDataProvider<Dependency> {
 	private _onDidChangeTreeData: vscode.EventEmitter<Dependency | undefined> = new vscode.EventEmitter<Dependency | undefined>();
 	readonly onDidChangeTreeData: vscode.Event<Dependency | undefined> = this._onDidChangeTreeData.event;
 
-	constructor(private data: any, private ActiveRepositoryInstance: any) {}
+	constructor(private data: any) {}
 
 	refresh(): void {
 		this._onDidChangeTreeData.fire();
