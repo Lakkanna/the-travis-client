@@ -56,6 +56,8 @@ export class RepoNodeProvider implements vscode.TreeDataProvider<Dependency> {
 							timeInfo = duration;
 						} else if (branch.state === 'created') {
 							timeInfo = 'Recently created';
+						} else if (branch.error) {
+							timeInfo = branch.error;
 						} else {
 							timeInfo = _.replace(time, /[\/]/g, "-");
 						}
@@ -149,6 +151,11 @@ export class Dependency extends vscode.TreeItem {
 					dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'branch.svg'),
 					light: path.join(__filename, '..', '..', '..', 'images', 'color', 'branch.svg'),
 				};
+			case 'loading':
+					return {
+						dark: path.join(__filename, '..', '..', '..', 'images', 'dark', 'refresh.svg'),
+						light: path.join(__filename, '..', '..', '..', 'images', 'light', 'refresh.svg'),
+					};
 			default:
 				return {
 					dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'repo.svg'),

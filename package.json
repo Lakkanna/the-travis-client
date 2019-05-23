@@ -51,6 +51,14 @@
 				"title": "Travis Client: The Travis Client"
 			},
 			{
+				"command": "theTravisClient.setToken",
+				"title": "Travis Client: Set Token",
+				"icon": {
+					"light": "images/light/gear.svg",
+					"dark": "images/dark/gear.svg"
+				}
+			},
+			{
 				"command": "theTravisClient.refresh",
 				"title": "Travis Client: Refresh",
 				"icon": {
@@ -63,6 +71,10 @@
 			"view/title": [
 				{
 					"command": "theTravisClient.refresh",
+					"group": "navigation"
+				},
+				{
+					"command": "theTravisClient.setToken",
 					"group": "navigation"
 				}
 			]
@@ -78,20 +90,10 @@
 						],
 						"description": "List of branches to get build status"
 					},
-					"travisClient.username": {
+					"travisClient.owner": {
 						"type": "string",
 						"default": "",
-						"description": "Travis username for the project"
-					},
-					"travisClient.pro": {
-						"type": "boolean",
-						"default": false,
-						"description": "Travis use pro or community"
-					},
-					"travisClient.github_oauth_token": {
-						"type": "string",
-						"default": "",
-						"description": "Travis pro github token for authentication"
+						"description": "Travis owner for the projects"
 					}
 				}
 			}
