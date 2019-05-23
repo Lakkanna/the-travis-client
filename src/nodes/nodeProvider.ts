@@ -20,7 +20,6 @@ export class RepoNodeProvider implements vscode.TreeDataProvider<Dependency> {
 		if (element) {
 			let data = _.get(element, ["prevData", element.label]);
 			if (!data) {
-				//data = this.data.filter((nestedEl: any) => nestedEl.name === element.label)[0][element.label];
 				data = _.chain(this.data)
 					.filter((nestedEl: any) => nestedEl.name === element.label)
 					.first()
@@ -66,14 +65,17 @@ export class RepoNodeProvider implements vscode.TreeDataProvider<Dependency> {
 						branch.state,
 						_.get(branch, "id", branch.name),
 						branch,
-						branch.name ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None
+						branch.active ? vscode.TreeItemCollapsibleState.Expanded : branch.name ?
+							vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None
 					);
 				});
 			} else {
 				return _.map(_.keys(data), (key) => {
-					return new Dependency(key, data[key].state, data[key].id ? data[key].id : key, data[key], vscode.TreeItemCollapsibleState.Collapsed);
+					return new Dependency(
+						key, data[key].state,
+						data[key].id ? data[key].id : key, data[key],
+						data[key].active ? vscode.TreeItemCollapsibleState.Expanded : vscode.TreeItemCollapsibleState.Collapsed);
 				});
-				//return [new Dependency(data.name, data.state, data, vscode.TreeItemCollapsibleState.Collapsed)];
 			}
 		} else {
 			return [];

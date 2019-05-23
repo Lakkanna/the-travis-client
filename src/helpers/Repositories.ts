@@ -15,7 +15,6 @@ export default class RepositoryHelper {
   }
 
   private requestFunction(token: string, uri: string, method: string, callback: (err: any, res: any, body: any) => any) {
-    console.log('request ', uri);
     const headers = {
       "Travis-API-Version": "3",
       "User-Agent": "API Explorer",
@@ -32,17 +31,14 @@ export default class RepositoryHelper {
     if (err) {
       console.error(err);
     }
-    console.log('branches ', JSON.parse(body));
   }
 
   private getBranches(err: any, res: any, body: any) {
     if (err) {
       console.error(err);
     }
-    console.log('repositories ', JSON.parse(body));
     const repositories = JSON.parse(body).repositories;
     _.forEach(repositories, (repo) => {
-      console.log('repo ', repo);
       this.requestFunction(
         this._authToken,
         this.branchesURLTemplate({'base': 'org', 'repoId': repo.id}),
@@ -61,9 +57,7 @@ export default class RepositoryHelper {
   }
 
   public initiate() {
-    console.log('dsjflksdjfjlsjf');
     const listOfRepositories = this.getRepositories();
-    // console.log(listOfRepositories);
     // actuall view creating, calling after getting required data
     // vscode.window.registerTreeDataProvider('repositories', new RepoNodeProvider(finalData, ActiveRepositoryInstance));
   }
