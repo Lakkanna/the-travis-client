@@ -3,7 +3,7 @@
 	"displayName": "The Travis Client",
 	"publisher": "Lakkannawalikar",
 	"description": "Extension to interact with travis build status",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"engines": {
 		"vscode": "^1.34.0"
 	},
@@ -16,6 +16,22 @@
 		"color": "#2d2d2d",
 		"theme": "dark"
 	},
+	"keywords": [
+		"travis",
+		"travis status",
+		"travis ci",
+		"the travis",
+		"the travis client",
+		"git",
+		"build",
+		"build status",
+		"repository",
+		"branch",
+		"push",
+		"client",
+		"status",
+		"ci"
+	],
 	"categories": [
 		"Other"
 	],

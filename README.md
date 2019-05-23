@@ -45,11 +45,15 @@ For example:
 
 ## Release Notes
 
-### 1.0.0
+### 0.0.1
 
 - Get all repositories from https://travis-ci.org
 - Get branches for all repositories
 - Get build status for all branches
+
+### 0.0.2
+
+- Added Keywords in package.json
 
 
 -----------------------------------------------------------------------------------------------------------

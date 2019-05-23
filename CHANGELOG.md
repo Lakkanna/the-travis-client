@@ -5,6 +5,10 @@
 - Add Travis Enterprise account
 - Add Pull requests build status
 
+## [0.0.2] - 2019-05-24
+### Added
+- Keywords in package.json
+
 ## [0.0.1] - 2019-05-24
 ### Added
 - Get all repositories from https://travis-ci.org
