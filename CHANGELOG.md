@@ -1,9 +1,12 @@
 # Change Log
 
-All notable changes to the "the-travis-client" extension will be documented in this file.
-
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
-
 ## [Unreleased]
 
-- Initial release
+- Add Travis Enterprise account
+- Add Pull requests build status
+
+## [0.0.1] - 2019-05-24
+### Added
+- Get all repositories from https://travis-ci.org
+- Get branches for all repositories
+- Get build status for all branches
