@@ -58,9 +58,9 @@ export function activate(context: vscode.ExtensionContext) {
 									const builds = JSON.parse(body3).builds;
 									let exitstingRepo: any = _.get(finalData, [rep.name]);
 									if (exitstingRepo) {
-										exitstingRepo[rep.name].push({ name: br.name, state: br.state ? rep.state : '', [br.name]: builds });
+										exitstingRepo[rep.name].push({ name: br.name, state: br.state ? rep.state : 'branch', [br.name]: builds });
 									} else {
-										finalData[rep.name] = {name: rep.name, [rep.name]: [{ name: br.name, state: br.state ? rep.state : '', [br.name]: builds }]};
+										finalData[rep.name] = {name: rep.name, state: 'repository', [rep.name]: [{ name: br.name, state: br.state ? br.state : 'branch', [br.name]: builds }]};
 									}
 									// actuall view creating, calling after getting required data
 									vscode.window.registerTreeDataProvider('repositories', new RepoNodeProvider(finalData, ActiveRepositoryInstance));

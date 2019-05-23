@@ -82,7 +82,7 @@ export class Dependency extends vscode.TreeItem {
 
 	constructor(
 		public readonly label: string,
-		private version: string,
+		private state: string,
 		public prevData: any,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		public readonly command?: vscode.Command
@@ -91,18 +91,62 @@ export class Dependency extends vscode.TreeItem {
 	}
 
 	get tooltip(): string {
-		return `${this.label}-${this.version}`;
+		if (this.state) {
+			return `${this.label}-${this.state}`;
+		} else {
+			return `${this.label}`;
+		}
 	}
 
 	get description(): string {
-		return this.version;
+		if (this.state === 'branch' || this.state === 'repository') {
+			return this.state;
+		} else {
+			return "";
+		}
 	}
 
-	iconPath = {
-		light: path.join(__filename, '..', '..', 'resources', 'light', 'dependency.svg'),
-		dark: path.join(__filename, '..', '..', 'resources', 'dark', 'dependency.svg')
-	};
+	public getIconPath() {
+		switch (this.state) {
+			case 'started':
+				return {
+					dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'clock.svg'),
+					light: path.join(__filename, '..', '..', '..', 'images', 'color', 'clock.svg'),
+				};
+			case 'running':
+				return {
+					dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'clock.svg'),
+					light: path.join(__filename, '..', '..', '..', 'images', 'color', 'clock.svg'),
+				};
+			case 'passed':
+				return {
+					dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'check.svg'),
+					light: path.join(__filename, '..', '..', '..', 'images', 'color', 'check.svg')
+				};
+			case 'failed': 
+				return {
+					dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'x.svg'),
+					light: path.join(__filename, '..', '..', '..', 'images', 'color', 'x.svg')
+				};
+			case 'errored': 
+				return {
+					dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'stop.svg'),
+					light: path.join(__filename, '..', '..', '..', 'images', 'color', 'stop.svg')
+				};
+			case 'branch':
+				return {
+					dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'branch.svg'),
+					light: path.join(__filename, '..', '..', '..', 'images', 'color', 'branch.svg'),
+				};
+			default:
+				return {
+					dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'repo.svg'),
+					light: path.join(__filename, '..', '..', '..', 'images', 'color', 'repo.svg')
+				};
+			}
+		}
 
+	iconPath = this.getIconPath();
 	contextValue = 'dependency';
 
 }
