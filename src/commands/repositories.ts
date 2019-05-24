@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 import { repositoryURLTemplate, branchesURLTemplate, buildsURLTemplate } from '../common/apiTemplates';
 import { RepoNodeProvider } from '../nodes/nodeProvider';
 import ActiveRepository from '../common/ActiveRepository';
+import ProjectDetails from '../common/ProjectDetails';
 
 export default class Repositories {
   private ActiveRepositoryInstance: any;
@@ -12,52 +13,86 @@ export default class Repositories {
       this.ActiveRepositoryInstance = new ActiveRepository(vscode.workspace.rootPath);
     }
   }
+
+  public showAuthError() {
+    vscode.window.showErrorMessage('Authentication error: invalid token');
+  }
+
   public loadData() {
+
     let finalData: any = {};
-    const token = this.context.globalState.get<string>('travisAuthToken', '');
-    if (token) {
+    const {token, base} = ProjectDetails.getProjectDetails(this.context);
+
+    if (ProjectDetails.getProjectDetails(this.context).token) {
+
       const headers = {
         "Travis-API-Version": "3",
-        "User-Agent": "API Explorer",
+        "User-Agent": "VSCode the-travis-client",
         "Authorization": `token ${token}`
       };
   
       request({
         headers: headers,
-        uri: repositoryURLTemplate({'base': 'org', 'owner': this.ActiveRepositoryInstance.username}),
+        uri: repositoryURLTemplate({'base': base, 'owner': this.ActiveRepositoryInstance.username}),
         method: 'GET'
       }, (err, res, body) => {
+
         if (err) {
           console.error(err);
         }
+
+        if (res.statusCode === 403) {
+          this.showAuthError();
+        }
+
         const repositories = JSON.parse(body).repositories;
-        
-        repositories.forEach((rep: any) => {
-  
+
+        _.forEach(repositories, (rep) => {
+
           request({
             headers: headers,
-            uri: branchesURLTemplate({'base': 'org', 'repoId': rep.id}),
+            uri: branchesURLTemplate({'base': base, 'repoId': rep.id}),
             method: 'GET'
           }, (err2, res2, body2) => {
+
             if (err2) {
               console.error(err2);
             }
-            const branchs = JSON.parse(body2).branches;
-  
+
+            if (res2.statusCode === 403) {
+              this.showAuthError();
+            }
+
+            const showableBranches = vscode.workspace.getConfiguration('travisClient').get('branches', []);
+
+            // show only user mentioned branches, if empty or undefined all branches will be shown
+            const branchs = _.filter(
+                JSON.parse(body2).branches, (branch) => {
+                  return _.isEmpty(showableBranches) ? true :  _.includes(showableBranches, branch.name);
+                });
+            
             if (res2.statusCode === 200) {
-              branchs.forEach((br: any) => {
-  
+
+              _.forEach(branchs, (br) => {
+
                 request({
                   headers: headers,
-                  uri: buildsURLTemplate({'base': 'org', 'repoId': rep.id, 'branch': br.name}),
+                  uri: buildsURLTemplate({'base': base, 'repoId': rep.id, 'branch': br.name}),
                   method: 'GET'
                 }, (err3, res3, body3) => {
+
                   if (err3) {
                     console.error(err3);
                   }
+
+                  if (res3.statusCode === 403) {
+                    this.showAuthError();
+                  }
+
                   if (res3.statusCode === 200) {
                     const builds = JSON.parse(body3).builds;
                     let exitstingRepo: any = _.get(finalData, [rep.name]);
+
                     if (exitstingRepo) {
                       exitstingRepo[rep.name].push({
                         name: br.name, active: this.ActiveRepositoryInstance.branch === br.name,
@@ -79,10 +114,13 @@ export default class Repositories {
             }
           });
         });
-      });
+        });
       // request end 
     } else {
-      vscode.window.registerTreeDataProvider('repositories', new RepoNodeProvider([{error: 'Add token: you are not added token yet.!', state: 'loading'}]));
+      vscode.window.registerTreeDataProvider('repositories',
+        new RepoNodeProvider([
+          { error: 'Add token: you are not added token yet.!', state: 'loading' }
+        ]));
     }
   }
 }
