@@ -122,10 +122,10 @@ export class Dependency extends vscode.TreeItem {
 					light: path.join(__filename, '..', '..', '..', 'images', 'color', 'clock.svg'),
 				};
 			case 'created':
-						return {
-							dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'plus.svg'),
-							light: path.join(__filename, '..', '..', '..', 'images', 'color', 'plus.svg'),
-						};
+				return {
+					dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'plus.svg'),
+					light: path.join(__filename, '..', '..', '..', 'images', 'color', 'plus.svg'),
+				};
 			case 'running':
 				return {
 					dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'clock.svg'),
@@ -152,10 +152,15 @@ export class Dependency extends vscode.TreeItem {
 					light: path.join(__filename, '..', '..', '..', 'images', 'color', 'branch.svg'),
 				};
 			case 'loading':
-					return {
-						dark: path.join(__filename, '..', '..', '..', 'images', 'dark', 'refresh.svg'),
-						light: path.join(__filename, '..', '..', '..', 'images', 'light', 'refresh.svg'),
-					};
+				return {
+					dark: path.join(__filename, '..', '..', '..', 'images', 'dark', 'refresh.svg'),
+					light: path.join(__filename, '..', '..', '..', 'images', 'light', 'refresh.svg'),
+				};
+			case 'info':
+				return {
+					dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'info.svg'),
+					light: path.join(__filename, '..', '..', '..', 'images', 'color', 'info.svg'),
+				};
 			default:
 				return {
 					dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'repo.svg'),

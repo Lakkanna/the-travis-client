@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as _ from 'lodash';
 import { RepoNodeProvider } from './nodes/nodeProvider';
-import Repositories from './commands/repositories';
+import Repositories from './helpers/repositories';
 import ProjectDetails from './common/ProjectDetails';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -22,7 +22,7 @@ export function activate(context: vscode.ExtensionContext) {
 		} else {
 			vscode.window.showErrorMessage('You have not added token, please add to get repositories.');
 			vscode.window.registerTreeDataProvider('repositories',
-				new RepoNodeProvider([{error: 'Add token: you are not added token yet.!', state: 'loading'}])
+				new RepoNodeProvider([{error: 'Add api-token: you are not added token yet.!', state: 'info'}])
 			);
 			ProjectDetailsInstance.setAuthToken(context);
 		}
