@@ -68,7 +68,15 @@
 			},
 			{
 				"command": "theTravisClient.setToken",
-				"title": "Travis Client: Set Token",
+				"title": "Travis Client: Set Community Token",
+				"icon": {
+					"light": "images/light/gear.svg",
+					"dark": "images/dark/gear.svg"
+				}
+			},
+			{
+				"command": "theTravisClient.setProToken",
+				"title": "Travis Client: Set Enterprise Token",
 				"icon": {
 					"light": "images/light/gear.svg",
 					"dark": "images/dark/gear.svg"
@@ -90,8 +98,12 @@
 					"group": "navigation"
 				},
 				{
+					"command": "theTravisClient.setProToken",
+					"group": "inline"
+				},
+				{
 					"command": "theTravisClient.setToken",
-					"group": "navigation"
+					"group": "inline"
 				}
 			]
 		},
@@ -110,6 +122,11 @@
 						"type": "string",
 						"default": "",
 						"description": "Travis owner for the projects"
+					},
+					"travisClient.pro": {
+						"type": "boolean",
+						"default": false,
+						"description": "Account type community or enterprise"
 					}
 				}
 			}
