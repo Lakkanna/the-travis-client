@@ -31,29 +31,48 @@ Extension requires three settings
 
 Copy **api-token**, you need it once after installing extension, you'll see pop-up paste there.
 
-**_Note_**: By miss if you missed pasting api-token, you can add it again by clicking on **_Gear_** icon which shows on REPOSITORIES title or you can run using command pallette `Shift + CMD + P` -> search for `Travis Client: Set token` and hit enter.
+**_Note_**: By miss if you missed pasting api-token, you can add it again by clicking on **_..._** icon which shows on REPOSITORIES title or you can run using command pallette `Shift + CMD + P` -> search for `Travis Client: Set <Community/Enterprise> Token` and hit enter.
+
+## API-Token setup
+* **Travis Enterprise**
+  - `(Shift + CMD + P)` search `>Travis Client: Set Enterprise Token` and hit enter, `Paste Travis Enterprise api-token` in input field. 
+
+* **Travis Community**
+  - `(Shift + CMD + P)` search `>Travis Client: Set Community Token` and hit enter, `Paste Travis Community api-token` in input field.
 
 This extension contributes the following settings:
 
-* `travisClient.owner`: owner name or organization name
-* `travisClient.branches`: want's to see only these branches build status
+* `travisClient.owner`: owner name or organization name, (_It's not github email id_).
+
+  - `owner`: Name in travis account
+* `travisClient.branches`: want's to see only these branches build status, default it'll show all branches
+* `travisClient.pro`: enables travis enterprise mode, which need to private repositories, for enterprise mode you need enterprise [api token](https://travis-ci.com/account/preferences) .
+default value for this is false.
 
 For example:
 
 * `"travisClient.owner": "lakkanna"`,
-* `"travisClient.branches": ["master", "sprint"]`
+* `"travisClient.branches": ["master", "sprint"]`,
+* `"travisClient.pro": true`
+
+### Note: If `travisClient.pro` is enabled, should add enterprise api-token.
+
+
+## `If you have any questions feel free to shoot an email:  `lakkannawalikar@gmail.com
 
 ## Release Notes
 
 ### 0.0.1
-
 - Get all repositories from https://travis-ci.org
 - Get branches for all repositories
 - Get build status for all branches
 
 ### 0.0.2
-
 - Added Keywords in package.json
+
+### 0.0.3
+- Added Travis Enterprise account (for private repository access)
+
 
 
 -----------------------------------------------------------------------------------------------------------

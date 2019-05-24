@@ -16,6 +16,9 @@ export default class Repositories {
 
   public showAuthError() {
     vscode.window.showErrorMessage('Authentication error: invalid token');
+    vscode.window.registerTreeDataProvider('repositories',
+      new RepoNodeProvider([{error: 'Add api-token: you are not added token yet.!', state: 'info'}])
+    );
   }
 
   public loadData() {
