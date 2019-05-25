@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+import { workspace, window, } from 'vscode';
 import * as _ from 'lodash';
 const Git = require('git-rev-2');
 
@@ -8,7 +8,8 @@ export default class ActiveRepository {
   private _activeBranch = '';
 
   constructor(private path: string) {
-    const owner = vscode.workspace.getConfiguration('travisClient').get<string>('owner');
+    const owner = workspace.getConfiguration('travisClient')
+      .get<string>('owner');
     if (_.isEmpty(owner)) {
       [this._username, this._repositoryName] = this.setRepositoryDetails();
     } else {
@@ -51,7 +52,7 @@ export default class ActiveRepository {
         const split = _.split(repo, '/');
         return split && split.length > 1 ? split : ['', ''];
       } catch (e) {
-        vscode.window.showErrorMessage("Make sure that git is configured properly.!");
+        window.showErrorMessage("Make sure that git is configured properly.!");
         return ['', ''];
       }
     } else {

@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+import { ExtensionContext, workspace, window } from 'vscode';
 import request = require('request');
 import * as _ from 'lodash';
 import { repositoryURLTemplate, branchesURLTemplate, buildsURLTemplate } from '../common/apiTemplates';
@@ -8,15 +8,15 @@ import ProjectDetails from '../common/ProjectDetails';
 
 export default class Repositories {
   private ActiveRepositoryInstance: any;
-  constructor(private context: vscode.ExtensionContext) {
-    if (vscode.workspace.rootPath) {
-      this.ActiveRepositoryInstance = new ActiveRepository(vscode.workspace.rootPath);
+  constructor(private context: ExtensionContext) {
+    if (workspace.rootPath) {
+      this.ActiveRepositoryInstance = new ActiveRepository(workspace.rootPath);
     }
   }
 
   public showAuthError() {
-    vscode.window.showErrorMessage('Authentication error: invalid token');
-    vscode.window.registerTreeDataProvider('repositories',
+    window.showErrorMessage('Authentication error: invalid token');
+    window.registerTreeDataProvider('repositories',
       new RepoNodeProvider([{error: 'Add api-token: you are not added token yet.!', state: 'info'}])
     );
   }
@@ -66,7 +66,7 @@ export default class Repositories {
               this.showAuthError();
             }
 
-            const showableBranches = vscode.workspace.getConfiguration('travisClient').get('branches', []);
+            const showableBranches = workspace.getConfiguration('travisClient').get('branches', []);
 
             // show only user mentioned branches, if empty or undefined all branches will be shown
             const branchs = _.filter(
@@ -110,7 +110,7 @@ export default class Repositories {
                       };
                     }
                     // actuall view creating, calling after getting required data
-                    vscode.window.registerTreeDataProvider('repositories', new RepoNodeProvider(finalData));
+                    window.registerTreeDataProvider('repositories', new RepoNodeProvider(finalData));
                   }
                 });
               });
@@ -120,7 +120,7 @@ export default class Repositories {
         });
       // request end 
     } else {
-      vscode.window.registerTreeDataProvider('repositories',
+      window.registerTreeDataProvider('repositories',
         new RepoNodeProvider([
           { error: 'Add token: you are not added token yet.!', state: 'loading' }
         ]));

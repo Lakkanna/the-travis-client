@@ -1,4 +1,5 @@
-import * as vscode from 'vscode';
+import { workspace, ExtensionContext,
+  window, commands, } from 'vscode';
 
 interface IKey {
   [key: string]: any;
@@ -29,11 +30,14 @@ const AccountType: IKey = {
 export default class ProjectDetails {
 
   static getAccountType() {
-    return vscode.workspace.getConfiguration('travisClient').get('pro') === true ? 'enterprise' : 'community';
+    return workspace.getConfiguration('travisClient')
+      .get('pro') === true ? 'enterprise' : 'community';
   }
 
-  static getProjectDetails(context: vscode.ExtensionContext) {
-    const currentProjectDetails = AccountType[ProjectDetails.getAccountType()];
+  static getProjectDetails(context: ExtensionContext) {
+    const currentProjectDetails = AccountType[
+      ProjectDetails.getAccountType()
+    ];
     return {
       base: currentProjectDetails.base,
       token: context.globalState.get(currentProjectDetails.storageKey, ""),
@@ -41,14 +45,14 @@ export default class ProjectDetails {
     };
   }
 
-  async setAuthToken(context: vscode.ExtensionContext, accountFlavour?:string) {
+  async setAuthToken(context: ExtensionContext, accountFlavour?:string) {
     let type = accountFlavour;
     if (!type) {
       type = ProjectDetails.getAccountType();
     }
 
     const accountContext: IObject = AccountType[type];
-    const newToken = await vscode.window.showInputBox({
+    const newToken = await window.showInputBox({
       prompt: accountContext.prompt,
       placeHolder: accountContext.placeholder,
       value: undefined
@@ -56,10 +60,10 @@ export default class ProjectDetails {
 
     if (newToken) {
       context.globalState.update(accountContext.storageKey, newToken);
-      vscode.commands.executeCommand('theTravisClient.refresh');
-      vscode.window.showInformationMessage('You successfully added token, loading repositories wait a moment.');
+      commands.executeCommand('theTravisClient.refresh');
+      window.showInformationMessage('You successfully added token, loading repositories wait a moment.');
     } else {
-      vscode.window.showWarningMessage('You failed to add token, try again (Shift + CMD + P) travis set token');
+      window.showWarningMessage('You failed to add token, try again (Shift + CMD + P) travis set token');
     }
   }
 

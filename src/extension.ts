@@ -1,27 +1,26 @@
-import * as vscode from 'vscode';
-import * as _ from 'lodash';
+import { ExtensionContext, commands, window } from 'vscode';
 import { RepoNodeProvider } from './nodes/nodeProvider';
 import Repositories from './helpers/repositories';
 import ProjectDetails from './common/ProjectDetails';
 
-export function activate(context: vscode.ExtensionContext) {
+export function activate(context: ExtensionContext) {
 
 	let ActiveRepositoryInstance: any;
 	const ProjectDetailsInstance = new ProjectDetails();
 
-	let disposable = vscode.commands.registerCommand('extension.theTravisClient', () => {
+	let disposable = commands.registerCommand('extension.theTravisClient', () => {
 
 		// actuall view creating, calling after getting required data
 		const token = ProjectDetails.getProjectDetails(context).token;
 		if (token) {
-			vscode.window.registerTreeDataProvider('repositories',
+			window.registerTreeDataProvider('repositories',
 				new RepoNodeProvider([{error: 'Loading: wait a moment..', state: 'loading'}])
 			);
 			const instance = new Repositories(context);
 			instance.loadData();
 		} else {
-			vscode.window.showErrorMessage('You have not added token, please add to get repositories.');
-			vscode.window.registerTreeDataProvider('repositories',
+			window.showErrorMessage('You have not added token, please add to get repositories.');
+			window.registerTreeDataProvider('repositories',
 				new RepoNodeProvider([{error: 'Add api-token: you are not added token yet.!', state: 'info'}])
 			);
 			ProjectDetailsInstance.setAuthToken(context);
@@ -29,15 +28,15 @@ export function activate(context: vscode.ExtensionContext) {
 
 	});
 
-	const setProToken = vscode.commands.registerCommand('theTravisClient.setProToken', function () {
+	const setProToken = commands.registerCommand('theTravisClient.setProToken', function () {
 		ProjectDetailsInstance.setAuthToken(context, 'enterprise');
 	});
 
-	const setToken = vscode.commands.registerCommand('theTravisClient.setToken', function () {
+	const setToken = commands.registerCommand('theTravisClient.setToken', function () {
 		ProjectDetailsInstance.setAuthToken(context, 'community');
 	});
 
-	const refresh = vscode.commands.registerCommand('theTravisClient.refresh', function () {
+	const refresh = commands.registerCommand('theTravisClient.refresh', function () {
 		const instance = new Repositories(context);
 		instance.loadData();
 	});
@@ -46,7 +45,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(setProToken);
 	context.subscriptions.push(setToken);
 	context.subscriptions.push(refresh);
-	vscode.commands.executeCommand('extension.theTravisClient');
+	commands.executeCommand('extension.theTravisClient');
 }
 
 // this method is called when your extension is deactivated

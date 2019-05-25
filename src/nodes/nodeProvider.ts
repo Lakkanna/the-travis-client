@@ -1,10 +1,14 @@
-import * as vscode from 'vscode';
+import { TreeDataProvider, EventEmitter,
+	Event, TreeItem, window, TreeItemCollapsibleState,
+	Command } from 'vscode';
 import * as path from 'path';
 import * as _ from 'lodash';
 
-export class RepoNodeProvider implements vscode.TreeDataProvider<Dependency> {
-	private _onDidChangeTreeData: vscode.EventEmitter<Dependency | undefined> = new vscode.EventEmitter<Dependency | undefined>();
-	readonly onDidChangeTreeData: vscode.Event<Dependency | undefined> = this._onDidChangeTreeData.event;
+export class RepoNodeProvider implements TreeDataProvider<Dependency> {
+	private _onDidChangeTreeData: EventEmitter<Dependency | undefined> =
+		new EventEmitter<Dependency | undefined>();
+	readonly onDidChangeTreeData: Event<Dependency | undefined> =
+		this._onDidChangeTreeData.event;
 
 	constructor(private data: any) {}
 
@@ -12,7 +16,7 @@ export class RepoNodeProvider implements vscode.TreeDataProvider<Dependency> {
 		this._onDidChangeTreeData.fire();
 	}
 
-	getTreeItem(element: Dependency): vscode.TreeItem {
+	getTreeItem(element: Dependency): TreeItem {
 		return element;
 	}
 
@@ -31,7 +35,7 @@ export class RepoNodeProvider implements vscode.TreeDataProvider<Dependency> {
 			if (this.data) {
 				return Promise.resolve(this.getDepsInPackageJson(this.data));
 			} else {
-				vscode.window.showInformationMessage('Problem while getting repositories.!');
+				window.showInformationMessage('Problem while getting repositories.!');
 				return Promise.resolve([]);
 			}
 		}
@@ -49,7 +53,9 @@ export class RepoNodeProvider implements vscode.TreeDataProvider<Dependency> {
 				return data.map((branch: any) => {
 					let timeInfo: string = '';
 					if (!branch.name) {
-						const time = new Date(_.get(branch, [_.get(timeEnum, [branch.state])])).toLocaleString();
+						const time = new Date(_.get(
+							branch, [_.get(timeEnum, [branch.state])]
+							)).toLocaleString();
 						if (branch.state === 'started') {
 							let duration = Math.round(_.get(branch, "duration")  / 60).toString();
 							duration += (duration === '1') ? ' minute' : ' minutes';
@@ -67,8 +73,8 @@ export class RepoNodeProvider implements vscode.TreeDataProvider<Dependency> {
 						branch.state,
 						_.get(branch, "id", branch.name),
 						branch,
-						branch.active ? vscode.TreeItemCollapsibleState.Expanded : branch.name ?
-							vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None
+						branch.active ? TreeItemCollapsibleState.Expanded : branch.name ?
+							TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
 					);
 				});
 			} else {
@@ -76,7 +82,8 @@ export class RepoNodeProvider implements vscode.TreeDataProvider<Dependency> {
 					return new Dependency(
 						key, data[key].state,
 						data[key].id ? data[key].id : key, data[key],
-						data[key].active ? vscode.TreeItemCollapsibleState.Expanded : vscode.TreeItemCollapsibleState.Collapsed);
+						data[key].active ? TreeItemCollapsibleState.Expanded :
+							TreeItemCollapsibleState.Collapsed);
 				});
 			}
 		} else {
@@ -85,15 +92,15 @@ export class RepoNodeProvider implements vscode.TreeDataProvider<Dependency> {
 	}
 }
 
-export class Dependency extends vscode.TreeItem {
+export class Dependency extends TreeItem {
 
 	constructor(
 		public readonly label: string,
 		private state: string,
 		private buildId: string,
 		public prevData: any,
-		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-		public readonly command?: vscode.Command
+		public readonly collapsibleState: TreeItemCollapsibleState,
+		public readonly command?: Command
 	) {
 		super(label, collapsibleState);
 	}
