@@ -1,18 +1,18 @@
-import { workspace, ExtensionContext,
-  window, commands, } from 'vscode';
+import { commands, ExtensionContext,
+  window, workspace, } from 'vscode';
 
-interface IKey {
+interface Key {
   [key: string]: any;
 }
 
-interface IObject {
+interface Content {
   storageKey: string;
   base: string;
   prompt: string;
   placeholder: string;
 }
 
-const AccountType: IKey = {
+const AccountType: Key = {
   'enterprise': {
     storageKey: 'travisProToken',
     base: 'com',
@@ -40,7 +40,7 @@ export default class ProjectDetails {
     ];
     return {
       base: currentProjectDetails.base,
-      token: context.globalState.get(currentProjectDetails.storageKey, ""),
+      token: context.globalState.get(currentProjectDetails.storageKey, ''),
       storageKey: currentProjectDetails.storageKey
     };
   }
@@ -51,7 +51,7 @@ export default class ProjectDetails {
       type = ProjectDetails.getAccountType();
     }
 
-    const accountContext: IObject = AccountType[type];
+    const accountContext: Content = AccountType[type];
     const newToken = await window.showInputBox({
       prompt: accountContext.prompt,
       placeHolder: accountContext.placeholder,
@@ -62,7 +62,8 @@ export default class ProjectDetails {
       context.globalState.update(accountContext.storageKey, newToken);
       commands.executeCommand('theTravisClient.refresh');
       window.showInformationMessage('You successfully added token, loading repositories wait a moment.');
-    } else {
+    }
+    else {
       window.showWarningMessage('You failed to add token, try again (Shift + CMD + P) travis set token');
     }
   }

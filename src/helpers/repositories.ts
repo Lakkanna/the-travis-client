@@ -1,7 +1,8 @@
-import { ExtensionContext, workspace, window } from 'vscode';
+import { ExtensionContext, window, workspace } from 'vscode';
+
 import request = require('request');
 import * as _ from 'lodash';
-import { repositoryURLTemplate, branchesURLTemplate, buildsURLTemplate } from '../common/apiTemplates';
+import { branchesURLTemplate, buildsURLTemplate, repositoryURLTemplate } from '../common/apiTemplates';
 import { RepoNodeProvider } from '../nodes/nodeProvider';
 import ActiveRepository from '../common/ActiveRepository';
 import ProjectDetails from '../common/ProjectDetails';
@@ -23,15 +24,15 @@ export default class Repositories {
 
   public loadData() {
 
-    let finalData: any = {};
+    const finalData: any = {};
     const {token, base} = ProjectDetails.getProjectDetails(this.context);
 
     if (ProjectDetails.getProjectDetails(this.context).token) {
 
       const headers = {
-        "Travis-API-Version": "3",
-        "User-Agent": "VSCode the-travis-client",
-        "Authorization": `token ${token}`
+        'Travis-API-Version': '3',
+        'User-Agent': 'VSCode the-travis-client',
+        'Authorization': `token ${token}`
       };
   
       request({
@@ -71,7 +72,7 @@ export default class Repositories {
             // show only user mentioned branches, if empty or undefined all branches will be shown
             const branchs = _.filter(
                 JSON.parse(body2).branches, (branch) => {
-                  return _.isEmpty(showableBranches) ? true :  _.includes(showableBranches, branch.name);
+                  return _.isEmpty(showableBranches) ? true : _.includes(showableBranches, branch.name);
                 });
             
             if (res2.statusCode === 200) {
@@ -94,14 +95,15 @@ export default class Repositories {
 
                   if (res3.statusCode === 200) {
                     const builds = JSON.parse(body3).builds;
-                    let exitstingRepo: any = _.get(finalData, [rep.name]);
+                    const exitstingRepo: any = _.get(finalData, [rep.name]);
 
                     if (exitstingRepo) {
                       exitstingRepo[rep.name].push({
                         name: br.name, active: this.ActiveRepositoryInstance.branch === br.name,
                         state: br.state ? rep.state : 'branch', [br.name]: builds
                       });
-                    } else {
+                    }
+                    else {
                       finalData[rep.name] = {
                         name: rep.name, active: this.ActiveRepositoryInstance.repository === rep.name,
                         state: 'repository', [rep.name]: [{ name: br.name, active: this.ActiveRepositoryInstance.branch === br.name,
@@ -119,7 +121,8 @@ export default class Repositories {
         });
         });
       // request end 
-    } else {
+    }
+    else {
       window.registerTreeDataProvider('repositories',
         new RepoNodeProvider([
           { error: 'Add token: you are not added token yet.!', state: 'loading' }

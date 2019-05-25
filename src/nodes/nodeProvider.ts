@@ -1,7 +1,6 @@
-import { TreeDataProvider, EventEmitter,
-	Event, TreeItem, window, TreeItemCollapsibleState,
-	Command } from 'vscode';
 import * as path from 'path';
+import { Command, Event, EventEmitter, TreeDataProvider,
+	TreeItem, TreeItemCollapsibleState, window } from 'vscode';
 import * as _ from 'lodash';
 
 export class RepoNodeProvider implements TreeDataProvider<Dependency> {
@@ -22,7 +21,7 @@ export class RepoNodeProvider implements TreeDataProvider<Dependency> {
 
 	public getChildren(element?: Dependency): Thenable<Dependency[]> {
 		if (element) {
-			let data = _.get(element, ["prevData", element.label]);
+			let data = _.get(element, ['prevData', element.label]);
 			if (!data) {
 				data = _.chain(this.data)
 					.filter((nestedEl: any) => nestedEl.name === element.label)
@@ -31,14 +30,12 @@ export class RepoNodeProvider implements TreeDataProvider<Dependency> {
 					.get(element.label);
 			}
 			return Promise.resolve(this.getDepsInPackageJson(data));
-		} else {
-			if (this.data) {
-				return Promise.resolve(this.getDepsInPackageJson(this.data));
-			} else {
-				window.showInformationMessage('Problem while getting repositories.!');
-				return Promise.resolve([]);
-			}
-		}
+		} 
+		if (this.data) {
+			return Promise.resolve(this.getDepsInPackageJson(this.data));
+		} 
+			window.showInformationMessage('Problem while getting repositories.!');
+			return Promise.resolve([]);
 	}
 
 	private getDepsInPackageJson(data: any): Dependency[] {
@@ -51,33 +48,36 @@ export class RepoNodeProvider implements TreeDataProvider<Dependency> {
 		if (data) {
 			if (Array.isArray(data)) {
 				return data.map((branch: any) => {
-					let timeInfo: string = '';
+					let timeInfo = '';
 					if (!branch.name) {
 						const time = new Date(_.get(
 							branch, [_.get(timeEnum, [branch.state])]
 							)).toLocaleString();
 						if (branch.state === 'started') {
-							let duration = Math.round(_.get(branch, "duration")  / 60).toString();
+							let duration = Math.round(_.get(branch, 'duration') / 60).toString();
 							duration += (duration === '1') ? ' minute' : ' minutes';
 							timeInfo = duration;
-						} else if (branch.state === 'created') {
+						}
+					 else if (branch.state === 'created') {
 							timeInfo = 'Recently created';
-						} else if (branch.error) {
+						}
+					 else if (branch.error) {
 							timeInfo = branch.error;
-						} else {
-							timeInfo = _.replace(time, /[\/]/g, "-");
+						}
+					 else {
+							timeInfo = _.replace(time, /[\/]/g, '-');
 						}
 					}
 					return new Dependency(
 						branch.name ? branch.name : timeInfo,
 						branch.state,
-						_.get(branch, "id", branch.name),
+						_.get(branch, 'id', branch.name),
 						branch,
 						branch.active ? TreeItemCollapsibleState.Expanded : branch.name ?
 							TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
 					);
 				});
-			} else {
+			} 
 				return _.map(_.keys(data), (key) => {
 					return new Dependency(
 						key, data[key].state,
@@ -85,10 +85,10 @@ export class RepoNodeProvider implements TreeDataProvider<Dependency> {
 						data[key].active ? TreeItemCollapsibleState.Expanded :
 							TreeItemCollapsibleState.Collapsed);
 				});
-			}
-		} else {
+			
+		} 
 			return [];
-		}
+		
 	}
 }
 
@@ -108,17 +108,17 @@ export class Dependency extends TreeItem {
 	get tooltip(): string {
 		if (this.state) {
 			return `${this.buildId}-${this.state}`;
-		} else {
+		} 
 			return `${this.buildId}`;
-		}
+		
 	}
 
 	get description(): string {
 		if (this.state === 'branch' || this.state === 'repository') {
 			return this.state;
-		} else {
-			return "";
-		}
+		} 
+			return '';
+		
 	}
 
 	public getIconPath() {

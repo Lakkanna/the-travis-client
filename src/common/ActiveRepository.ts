@@ -1,4 +1,4 @@
-import { workspace, window, } from 'vscode';
+import { window, workspace, } from 'vscode';
 import * as _ from 'lodash';
 const Git = require('git-rev-2');
 
@@ -12,9 +12,10 @@ export default class ActiveRepository {
       .get<string>('owner');
     if (_.isEmpty(owner)) {
       [this._username, this._repositoryName] = this.setRepositoryDetails();
-    } else {
+    }
+    else {
       [this._username, this._repositoryName] = this.setRepositoryDetails();
-      this._username = owner || "";
+      this._username = owner || '';
     }
 
     this.getActiveBranch();
@@ -38,10 +39,10 @@ export default class ActiveRepository {
     const fs = require('fs');
 
     if (this.path) {
-      let configFile = path.join(this.path, '.git', 'config');
+      const configFile = path.join(this.path, '.git', 'config');
       try {
-        let config = ini.parse(fs.readFileSync(configFile, 'utf-8'));
-        let origin = _.get(config, ['remote "origin"']);
+        const config = ini.parse(fs.readFileSync(configFile, 'utf-8'));
+        const origin = _.get(config, ['remote "origin"']);
         if (!origin && !origin.url) {
           return ['', ''];
         }
@@ -51,11 +52,13 @@ export default class ActiveRepository {
         }
         const split = _.split(repo, '/');
         return split && split.length > 1 ? split : ['', ''];
-      } catch (e) {
-        window.showErrorMessage("Make sure that git is configured properly.!");
+      }
+      catch (e) {
+        window.showErrorMessage('Make sure that git is configured properly.!');
         return ['', ''];
       }
-    } else {
+    }
+    else {
       return ['', ''];
     }
   }
