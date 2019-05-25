@@ -27,7 +27,7 @@ const AccountType: Key = {
   }
 };
 
-export default class ProjectDetails {
+export class ProjectDetails {
 
   static getAccountType() {
     return workspace.getConfiguration('travisClient')

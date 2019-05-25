@@ -1,8 +1,11 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import { window, workspace, } from 'vscode';
 import * as _ from 'lodash';
-const Git = require('git-rev-2');
+import * as Git from 'git-rev-2';
+import * as ini from 'ini';
 
-export default class ActiveRepository {
+export class ActiveRepository {
   private _username = '';
   private _repositoryName = '';
   private _activeBranch = '';
@@ -34,9 +37,6 @@ export default class ActiveRepository {
   }
 
   private setRepositoryDetails() {
-    const ini = require('ini');
-    const path = require('path');
-    const fs = require('fs');
 
     if (this.path) {
       const configFile = path.join(this.path, '.git', 'config');
@@ -46,7 +46,7 @@ export default class ActiveRepository {
         if (!origin && !origin.url) {
           return ['', ''];
         }
-        let repo: any = _.replace(origin.url, /^(.*\/\/)?[^\/:]+[\/:]/, '');
+        let repo: any = _.replace(origin.url, /^(.*\/\/)?[^/:]+[/:]/, '');
         if (_.endsWith(repo, '.git')) {
           repo = _.head(_.split(repo, '.git'));
         }

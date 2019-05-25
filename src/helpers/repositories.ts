@@ -1,13 +1,12 @@
 import { ExtensionContext, window, workspace } from 'vscode';
-
-import request = require('request');
+import * as request from 'request';
 import * as _ from 'lodash';
 import { branchesURLTemplate, buildsURLTemplate, repositoryURLTemplate } from '../common/apiTemplates';
 import { RepoNodeProvider } from '../nodes/nodeProvider';
-import ActiveRepository from '../common/ActiveRepository';
-import ProjectDetails from '../common/ProjectDetails';
+import { ActiveRepository } from '../common/ActiveRepository';
+import { ProjectDetails } from '../common/ProjectDetails';
 
-export default class Repositories {
+export class Repositories {
   private ActiveRepositoryInstance: any;
   constructor(private context: ExtensionContext) {
     if (workspace.rootPath) {

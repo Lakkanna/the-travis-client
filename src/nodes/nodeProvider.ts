@@ -65,7 +65,7 @@ export class RepoNodeProvider implements TreeDataProvider<Dependency> {
 							timeInfo = branch.error;
 						}
 					 else {
-							timeInfo = _.replace(time, /[\/]/g, '-');
+							timeInfo = _.replace(time, /[/]/g, '-');
 						}
 					}
 					return new Dependency(

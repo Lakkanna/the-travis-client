@@ -1,11 +1,10 @@
 import { ExtensionContext, commands, window } from 'vscode';
 import { RepoNodeProvider } from './nodes/nodeProvider';
-import Repositories from './helpers/repositories';
-import ProjectDetails from './common/ProjectDetails';
+import { Repositories } from './helpers/repositories';
+import { ProjectDetails } from './common/ProjectDetails';
 
 export function activate(context: ExtensionContext) {
 
-	let ActiveRepositoryInstance: any;
 	const ProjectDetailsInstance = new ProjectDetails();
 
 	let disposable = commands.registerCommand('extension.theTravisClient', () => {
