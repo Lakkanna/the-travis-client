@@ -1,5 +1,4 @@
-import { commands, ExtensionContext,
-  window, workspace, } from 'vscode';
+import { commands, ExtensionContext, window, workspace } from 'vscode';
 
 interface Key {
   [key: string]: any;
@@ -13,31 +12,27 @@ interface Content {
 }
 
 const AccountType: Key = {
-  'enterprise': {
+  enterprise: {
     storageKey: 'travisProToken',
     base: 'com',
     prompt: 'Please add enterprise auth token for travis client!',
-    placeHolder: 'Add travis enterprise token here',
+    placeHolder: 'Add travis enterprise token here'
   },
-  'community': {
+  community: {
     storageKey: 'travisAuthToken',
     base: 'org',
     prompt: 'Please add community auth token for travis client!',
-    placeHolder: 'Add travis community token here',
+    placeHolder: 'Add travis community token here'
   }
 };
 
 export class ProjectDetails {
-
   static getAccountType() {
-    return workspace.getConfiguration('travisClient')
-      .get('pro') === true ? 'enterprise' : 'community';
+    return workspace.getConfiguration('travisClient').get('pro') === true ? 'enterprise' : 'community';
   }
 
   static getProjectDetails(context: ExtensionContext) {
-    const currentProjectDetails = AccountType[
-      ProjectDetails.getAccountType()
-    ];
+    const currentProjectDetails = AccountType[ProjectDetails.getAccountType()];
     return {
       base: currentProjectDetails.base,
       token: context.globalState.get(currentProjectDetails.storageKey, ''),
@@ -45,7 +40,7 @@ export class ProjectDetails {
     };
   }
 
-  async setAuthToken(context: ExtensionContext, accountFlavour?:string) {
+  async setAuthToken(context: ExtensionContext, accountFlavour?: string) {
     let type = accountFlavour;
     if (!type) {
       type = ProjectDetails.getAccountType();
@@ -67,5 +62,4 @@ export class ProjectDetails {
       window.showWarningMessage('You failed to add token, try again (Shift + CMD + P) travis set token');
     }
   }
-
 }

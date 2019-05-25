@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { window, workspace, } from 'vscode';
+import { window, workspace } from 'vscode';
 import * as _ from 'lodash';
 import * as Git from 'git-rev-2';
 import * as ini from 'ini';
@@ -11,8 +11,7 @@ export class ActiveRepository {
   private _activeBranch = '';
 
   constructor(private path: string) {
-    const owner = workspace.getConfiguration('travisClient')
-      .get<string>('owner');
+    const owner = workspace.getConfiguration('travisClient').get<string>('owner');
     if (_.isEmpty(owner)) {
       [this._username, this._repositoryName] = this.setRepositoryDetails();
     }
@@ -37,7 +36,6 @@ export class ActiveRepository {
   }
 
   private setRepositoryDetails() {
-
     if (this.path) {
       const configFile = path.join(this.path, '.git', 'config');
       try {
@@ -62,7 +60,7 @@ export class ActiveRepository {
       return ['', ''];
     }
   }
-  
+
   private getActiveBranch() {
     Git.branch(this.path, (err: never, activeBranch: string) => {
       this._activeBranch = activeBranch;
