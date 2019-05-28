@@ -61,23 +61,25 @@ For example:
 
 ### Note: If `travisClient.pro` is enabled, should add enterprise api-token.
 
-## `If you have any questions feel free to shoot an email:`lakkannawalikar@gmail.com
+### `If you have any questions feel free to shoot an email: ` lakkannawalikar@gmail.com
 
 ## Release Notes
 
 ### 0.0.1
-
 - Get all repositories from https://travis-ci.org
 - Get branches for all repositories
 - Get build status for all branches
 
 ### 0.0.2
-
 - Added Keywords in package.json
 
 ### 0.0.3
-
 - Added Travis Enterprise account (for private repository access)
+
+### 0.0.4
+- Check is travis project
+- Auto refresh on configuration changes in **settings.json**
+- Reasonable error messages
 
 ---
 
