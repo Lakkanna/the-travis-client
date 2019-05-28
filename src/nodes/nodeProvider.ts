@@ -84,6 +84,9 @@ export class RepoNodeProvider implements TreeDataProvider<Dependency> {
         if (e.response.status === 403) {
           window.showErrorMessage('Authentication error: invalid token');
           return Promise.resolve([new Dependency("Api token error!", "errored", "api token ", {}, TreeItemCollapsibleState.None)]);
+        } else if (e.response.status === 404) {
+          window.showErrorMessage('Owner/Repository not found!');
+          return Promise.resolve([new Dependency("Owner/Repository not found!", "errored", "owner/repository not found", {}, TreeItemCollapsibleState.None)]);
         }
         else {
           window.showErrorMessage(e.message);

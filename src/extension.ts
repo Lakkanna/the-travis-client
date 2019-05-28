@@ -1,4 +1,4 @@
-import { commands, ExtensionContext } from 'vscode';
+import { commands, ExtensionContext, workspace } from 'vscode';
 import { ProjectDetails } from './common/ProjectDetails';
 import { RepositoryView } from './views/repositoryView';
 
@@ -9,6 +9,16 @@ export function activate(context: ExtensionContext) {
   const tree = repoView.initialise();
 
   const disposable = commands.registerCommand('extension.theTravisClient', () => tree);
+
+  const onChangeConfigurationDisposable = workspace.onDidChangeConfiguration((event) => {
+    const onChangeBranches = event.affectsConfiguration('travisClient.branches');
+    const onChangePro = event.affectsConfiguration('travisClient.pro');
+    const onChangeOwner = event.affectsConfiguration('travisClient.owner');
+    if (onChangeBranches || onChangePro || onChangeOwner) {
+      commands.executeCommand('theTravisClient.refresh');
+    }
+  });
+
   const setProToken = commands.registerCommand('theTravisClient.setProToken', function() {
     ProjectDetailsInstance.setAuthToken(context, 'enterprise');
   });
@@ -23,6 +33,7 @@ export function activate(context: ExtensionContext) {
   });
 
   context.subscriptions.push(disposable);
+  context.subscriptions.push(onChangeConfigurationDisposable);
   context.subscriptions.push(setProToken);
   context.subscriptions.push(setToken);
   context.subscriptions.push(refresh);
