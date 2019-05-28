@@ -36,7 +36,9 @@
     "Other"
   ],
   "activationEvents": [
-    "*"
+    "workspaceContains:.travis.yml",
+    "onView:repositories",
+    "onCommand:extension.theTravisClient"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -158,6 +160,7 @@
     "@types/request": "2.48.1",
     "@typescript-eslint/eslint-plugin": "1.9.0",
     "@typescript-eslint/parser": "1.9.0",
+    "axios": "0.18.0",
     "eslint": "5.16.0",
     "eslint-cli": "1.1.1",
     "eslint-config-prettier": "4.3.0",
@@ -171,7 +174,6 @@
     "vscode": "^1.1.28"
   },
   "dependencies": {
-    "git-rev-2": "0.1.0",
-    "request": "2.88.0"
+    "git-rev-2": "0.1.0"
   }
 }

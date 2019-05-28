@@ -1,12 +1,25 @@
 import * as path from 'path';
-import { Command, Event, EventEmitter, TreeDataProvider, TreeItem, TreeItemCollapsibleState, window } from 'vscode';
+import { Repositories } from '../helpers/repositories';
+import { Command, Event, EventEmitter, TreeDataProvider, TreeItem, TreeItemCollapsibleState, window, ExtensionContext, workspace } from 'vscode';
 import * as _ from 'lodash';
+import { ActiveRepository } from '../common/ActiveRepository';
+import { ProjectDetails } from '../common/ProjectDetails';
 
 export class RepoNodeProvider implements TreeDataProvider<Dependency> {
   private _onDidChangeTreeData: EventEmitter<Dependency | undefined> = new EventEmitter<Dependency | undefined>();
   readonly onDidChangeTreeData: Event<Dependency | undefined> = this._onDidChangeTreeData.event;
 
-  constructor(private data: any) {}
+  public repoInstance: any;
+  public ActiveRepositoryInstance: any;
+  public ProjectDetailsInstance: any;
+
+  constructor(private context: ExtensionContext) {
+    this.repoInstance = new Repositories(this.context);
+    if (workspace.rootPath) {
+      this.ActiveRepositoryInstance = new ActiveRepository(workspace.rootPath);
+      this.ProjectDetailsInstance = new ProjectDetails();
+    }
+  }
 
   refresh(): void {
     this._onDidChangeTreeData.fire();
@@ -15,78 +28,86 @@ export class RepoNodeProvider implements TreeDataProvider<Dependency> {
   getTreeItem(element: Dependency): TreeItem {
     return element;
   }
-
-  public getChildren(element?: Dependency): Thenable<Dependency[]> {
-    if (element) {
-      let data = _.get(element, ['prevData', element.label]);
-      if (!data) {
-        data = _.chain(this.data)
-          .filter((nestedEl: any) => nestedEl.name === element.label)
-          .first()
-          .value()
-          .get(element.label);
-      }
-      return Promise.resolve(this.getDepsInPackageJson(data));
-    }
-    if (this.data) {
-      return Promise.resolve(this.getDepsInPackageJson(this.data));
-    }
-    window.showInformationMessage('Problem while getting repositories.!');
-    return Promise.resolve([]);
-  }
-
-  private getDepsInPackageJson(data: any): Dependency[] {
+  
+  public getTimeInfo(data: any) {
     const timeEnum = {
       passed: 'finished_at',
       started: 'started_at',
       errored: 'started_at',
       failed: 'finished_at'
     };
-    if (data) {
-      if (Array.isArray(data)) {
-        return data.map((branch: any) => {
-          let timeInfo = '';
-          if (!branch.name) {
-            const time = new Date(_.get(branch, [_.get(timeEnum, [branch.state])])).toLocaleString();
-            if (branch.state === 'started') {
-              let duration = Math.round(_.get(branch, 'duration') / 60).toString();
-              duration += duration === '1' ? ' minute' : ' minutes';
-              timeInfo = duration;
-            }
-            else if (branch.state === 'created') {
-              timeInfo = 'Recently created';
-            }
-            else if (branch.error) {
-              timeInfo = branch.error;
-            }
-            else {
-              timeInfo = _.replace(time, /[/]/g, '-');
-            }
+    const time = new Date(_.get(data, [_.get(timeEnum, [data.state])])).toLocaleString();
+    switch (data.state) {
+      case "started":
+        let duration = Math.round(_.get(data, 'duration') / 60).toString();
+        duration += duration === '1' ? ' minute' : ' minutes';
+        return duration;
+
+      case "created":
+        return "now created";
+    
+      default:
+        return _.replace(time, /[/]/g, '-');
+    }
+  }
+
+  async getPreparedData(element?: Dependency) {
+    if (element) {
+      if (!element.prevData) {
+        return [];
+      } else {
+        return _.map(element.prevData.data, (d: any, k) => {
+          if (_.isArray(element.prevData.data)) {
+            return new Dependency(this.getTimeInfo(d), d.state, d.id, d, TreeItemCollapsibleState.None);
+          } else {
+            return new Dependency(k, "branch", k, {data: d}, this.ActiveRepositoryInstance.branch === k ? TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
           }
-          return new Dependency(
-            branch.name ? branch.name : timeInfo,
-            branch.state,
-            _.get(branch, 'id', branch.name),
-            branch,
-            branch.active
-              ? TreeItemCollapsibleState.Expanded
-              : branch.name
-              ? TreeItemCollapsibleState.Collapsed
-              : TreeItemCollapsibleState.None
-          );
         });
       }
-      return _.map(_.keys(data), key => {
-        return new Dependency(
-          key,
-          data[key].state,
-          data[key].id ? data[key].id : key,
-          data[key],
-          data[key].active ? TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed
-        );
-      });
+    } else {
+      try {
+        const data = await this.repoInstance.loadData();
+        const preparedData = _.chain(data)
+        .flatMap()
+        .groupBy("repository.name")
+        .mapValues((v, k) => ({
+          name: k,
+          state: "repository",
+          id: "",
+          data: {..._.groupBy(v, "branch.name")}
+        }))
+        .value();
+        return _.map(preparedData, eachData => {
+          return new Dependency(eachData.name, eachData.state, eachData.name, eachData, this.ActiveRepositoryInstance.repository === eachData.name ? TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
+        });
+      } catch (e) {
+        if (e.response.status === 403) {
+          window.showErrorMessage('Authentication error: invalid token');
+          return Promise.resolve([new Dependency("Api token error!", "errored", "api token ", {}, TreeItemCollapsibleState.None)]);
+        }
+        else {
+          window.showErrorMessage(e.message);
+          return Promise.resolve([new Dependency(e.message, "errored", e.response.status, {}, TreeItemCollapsibleState.None)]);
+        }
+      }
     }
-    return [];
+  }
+
+  async getChildren(element?: Dependency): Promise<any> {
+    if (ProjectDetails.isTravisProject()) {
+      const token = ProjectDetails.getProjectDetails(this.context).token;
+      if (token) {
+        return await this.getPreparedData(element);
+      } else {
+        window.showErrorMessage('You have not added token, please add to get repositories.');
+        this.ProjectDetailsInstance.setAuthToken(this.context);
+        return [new Dependency("Add api-token", "info", "api", {}, TreeItemCollapsibleState.None)];
+      }
+    }
+    else {
+      window.showErrorMessage('This is not a travis project!');
+      return [new Dependency("Not a travis project", "errored", "not a travis project", {}, TreeItemCollapsibleState.None)];
+    }
   }
 }
 

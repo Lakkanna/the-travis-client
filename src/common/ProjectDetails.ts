@@ -1,3 +1,5 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import { commands, ExtensionContext, window, workspace } from 'vscode';
 
 interface Key {
@@ -27,6 +29,22 @@ const AccountType: Key = {
 };
 
 export class ProjectDetails {
+
+  // referenced from felixrieseberg/vsc-travis-ci-status
+  static isTravisProject(): Boolean {
+    if (!workspace || !workspace.rootPath) {
+      return false;
+    }
+		let conf = path.join(workspace.rootPath, '.travis.yml');
+
+		try {
+			return fs.statSync(conf).isFile();
+		}
+		catch (err) {
+			return false;
+		}
+  }
+
   static getAccountType() {
     return workspace.getConfiguration('travisClient').get('pro') === true ? 'enterprise' : 'community';
   }
