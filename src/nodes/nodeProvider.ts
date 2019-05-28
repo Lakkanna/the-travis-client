@@ -1,7 +1,7 @@
 import * as path from 'path';
-import { Repositories } from '../helpers/repositories';
-import { Command, Event, EventEmitter, TreeDataProvider, TreeItem, TreeItemCollapsibleState, window, ExtensionContext, workspace } from 'vscode';
+import { Command, Event, EventEmitter, ExtensionContext, TreeDataProvider, TreeItem, TreeItemCollapsibleState, window, workspace } from 'vscode';
 import * as _ from 'lodash';
+import { Repositories } from '../helpers/repositories';
 import { ActiveRepository } from '../common/ActiveRepository';
 import { ProjectDetails } from '../common/ProjectDetails';
 
@@ -37,14 +37,15 @@ export class RepoNodeProvider implements TreeDataProvider<Dependency> {
       failed: 'finished_at'
     };
     const time = new Date(_.get(data, [_.get(timeEnum, [data.state])])).toLocaleString();
+    let duration: string;
     switch (data.state) {
-      case "started":
-        let duration = Math.round(_.get(data, 'duration') / 60).toString();
+      case 'started':
+        duration = _.toString(_.round(_.get(data, 'duration') / 60));
         duration += duration === '1' ? ' minute' : ' minutes';
         return duration;
 
-      case "created":
-        return "now created";
+      case 'created':
+        return 'now created';
     
       default:
         return _.replace(time, /[/]/g, '-');
@@ -55,62 +56,64 @@ export class RepoNodeProvider implements TreeDataProvider<Dependency> {
     if (element) {
       if (!element.prevData) {
         return [];
-      } else {
-        return _.map(element.prevData.data, (d: any, k) => {
-          if (_.isArray(element.prevData.data)) {
-            return new Dependency(this.getTimeInfo(d), d.state, d.id, d, TreeItemCollapsibleState.None);
-          } else {
-            return new Dependency(k, "branch", k, {data: d}, this.ActiveRepositoryInstance.branch === k ? TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
-          }
-        });
-      }
-    } else {
+      } 
+      return _.map(element.prevData.data, (d: any, k) => {
+        if (_.isArray(element.prevData.data)) {
+          return new Dependency(this.getTimeInfo(d), d.state, d.id, d, TreeItemCollapsibleState.None);
+        }
+        return new Dependency(k, 'branch', k, {data: d}, this.ActiveRepositoryInstance.branch === k ? TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
+
+      });
+      
+    } 
       try {
         const data = await this.repoInstance.loadData();
         const preparedData = _.chain(data)
         .flatMap()
-        .groupBy("repository.name")
+        .groupBy('repository.name')
         .mapValues((v, k) => ({
           name: k,
-          state: "repository",
-          id: "",
-          data: {..._.groupBy(v, "branch.name")}
+          state: 'repository',
+          id: '',
+          data: {..._.groupBy(v, 'branch.name')}
         }))
         .value();
         return _.map(preparedData, eachData => {
           return new Dependency(eachData.name, eachData.state, eachData.name, eachData, this.ActiveRepositoryInstance.repository === eachData.name ? TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
         });
-      } catch (e) {
+      }
+      catch (e) {
         if (e.response.status === 403) {
           window.showErrorMessage('Authentication error: invalid token');
-          return Promise.resolve([new Dependency("Api token error!", "errored", "api token ", {}, TreeItemCollapsibleState.None)]);
-        } else if (e.response.status === 404) {
+          return Promise.resolve([new Dependency('Api token error!', 'errored', 'api token', {}, TreeItemCollapsibleState.None)]);
+        }
+        else if (e.response.status === 404) {
           window.showErrorMessage('Owner/Repository not found!');
-          return Promise.resolve([new Dependency("Owner/Repository not found!", "errored", "owner/repository not found", {}, TreeItemCollapsibleState.None)]);
+          return Promise.resolve([new Dependency('Owner/Repository not found!', 'errored', 'owner/repository not found', {}, TreeItemCollapsibleState.None)]);
         }
-        else {
-          window.showErrorMessage(e.message);
-          return Promise.resolve([new Dependency(e.message, "errored", e.response.status, {}, TreeItemCollapsibleState.None)]);
-        }
+        
+        window.showErrorMessage(e.message);
+        return Promise.resolve([new Dependency(e.message, 'errored', e.response.status, {}, TreeItemCollapsibleState.None)]);
+        
       }
-    }
+    
   }
 
   async getChildren(element?: Dependency): Promise<any> {
     if (ProjectDetails.isTravisProject()) {
       const token = ProjectDetails.getProjectDetails(this.context).token;
       if (token) {
-        return await this.getPreparedData(element);
-      } else {
-        window.showErrorMessage('You have not added token, please add to get repositories.');
-        this.ProjectDetailsInstance.setAuthToken(this.context);
-        return [new Dependency("Add api-token", "info", "api", {}, TreeItemCollapsibleState.None)];
-      }
+        const data = await this.getPreparedData(element);
+        return data;
+      } 
+      window.showErrorMessage('You have not added token, please add to get repositories.');
+      this.ProjectDetailsInstance.setAuthToken(this.context);
+      return [new Dependency('Add api-token', 'info', 'api', {}, TreeItemCollapsibleState.None)];
+      
     }
-    else {
-      window.showErrorMessage('This is not a travis project!');
-      return [new Dependency("Not a travis project", "errored", "not a travis project", {}, TreeItemCollapsibleState.None)];
-    }
+
+    window.showErrorMessage('This is not a travis project!');
+    return [new Dependency('Not a travis project', 'errored', 'not a travis project', {}, TreeItemCollapsibleState.None)];
   }
 }
 

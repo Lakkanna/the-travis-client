@@ -1,9 +1,9 @@
 import { ExtensionContext, workspace } from 'vscode';
-const axios = require("axios");
 import * as _ from 'lodash';
 import { branchesURLTemplate, buildsURLTemplate, repositoryURLTemplate } from '../common/apiTemplates';
 import { ActiveRepository } from '../common/ActiveRepository';
 import { ProjectDetails } from '../common/ProjectDetails';
+const axios = require('axios');
 
 export class Repositories {
 
@@ -13,8 +13,8 @@ export class Repositories {
   private base: string;
 
   constructor(private context: ExtensionContext) {
-    this.token = "";
-    this.base = "";
+    this.token = '';
+    this.base = '';
     if (workspace.rootPath) {
       this.ActiveRepositoryInstance = new ActiveRepository(workspace.rootPath);
       const obj = ProjectDetails.getProjectDetails(this.context);
@@ -36,7 +36,8 @@ export class Repositories {
       }), {headers: this.headers});
 
       return response.data.repositories;
-    } catch (e) {
+    }
+    catch (e) {
       return Promise.reject(e);
     }
   }
@@ -45,16 +46,18 @@ export class Repositories {
     try {
       const repos = await this.getRepositories();
 
-      let d = _.map(repos, async rep => {
+      const branchesPromise = _.map(repos, async rep => {
         try {
           const response = await axios.get(branchesURLTemplate({ base: this.base, repoId: rep.id }), {headers: this.headers});
           return response.data.branches;
-        } catch (e) {
+        }
+        catch (e) {
           return Promise.reject(e);
         }
       });
-      return Promise.all(d);
-    } catch (e) {
+      return Promise.all(branchesPromise);
+    }
+    catch (e) {
       return Promise.reject(e);
     }
   }
@@ -63,7 +66,7 @@ export class Repositories {
     try {
       const branches = await this.getBranches();
       const actualBranches = _.filter(branches, b => !_.isEmpty(b));
-      let filteredBranches: any = [];
+      const filteredBranches: any = [];
       const showableBranches = workspace.getConfiguration('travisClient').get('branches', []);
 
       _.forEach(actualBranches, br => {
@@ -74,19 +77,21 @@ export class Repositories {
         });
       });
 
-      let buildsPromise = _.map(filteredBranches, async br => {
+      const buildsPromise = _.map(filteredBranches, async br => {
         try {
           const response = await axios.get(
-            buildsURLTemplate({ base: this.base, repoId: _.get(br, "repository.id"), branch: _.get(br, "name") }),
+            buildsURLTemplate({ base: this.base, repoId: _.get(br, 'repository.id'), branch: _.get(br, 'name') }),
             {headers: this.headers}
           );
           return response.data.builds;
-        } catch (e) {
+        }
+        catch (e) {
           return Promise.reject(e);
         }
       });
       return Promise.all(buildsPromise);
-    } catch (e) {
+    }
+    catch (e) {
       return Promise.reject(e);
     }
   }

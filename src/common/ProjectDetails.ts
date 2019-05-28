@@ -31,11 +31,11 @@ const AccountType: Key = {
 export class ProjectDetails {
 
   // referenced from felixrieseberg/vsc-travis-ci-status
-  static isTravisProject(): Boolean {
+  static isTravisProject(): boolean {
     if (!workspace || !workspace.rootPath) {
       return false;
     }
-		let conf = path.join(workspace.rootPath, '.travis.yml');
+		const conf = path.join(workspace.rootPath, '.travis.yml');
 
 		try {
 			return fs.statSync(conf).isFile();
