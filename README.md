@@ -13,52 +13,55 @@ Extension to interact with travis build status.
 
 Lists last 10 builds for each branch for all repositories you own or organization, the build status is shown using icon.
 
-![demo](images/demo2.png)   ![demo](images/demo3.png)
+![demo](images/demo2.png) ![demo](images/demo3.png)
 
 ## Requirements
 
 - Account should be there in travis-ci account and `api-token`.
-  * [Travis-CI api-token](https://travis-ci.org/account/preferences) -> settings --> COPY TOKEN
+  - [Travis-CI api-token](https://travis-ci.org/account/preferences) -> settings --> COPY TOKEN
 - Repositories should be active for builds in travis-ci.
 - Owner or Orgonization name for the repositories.
 
 ## Extension Settings
 
 Extension requires three settings
-* **owner/organization name** _(mandatory)_
-* **api-token** _(mandatory)_: this you will find in travis account settings,
-* **branches** _(optional)_ if you not added branches it show status for all branches.
+
+- **owner/organization name** _(mandatory)_
+- **api-token** _(mandatory)_: this you will find in travis account settings,
+- **branches** _(optional)_ if you not added branches it show status for all branches.
 
 Copy **api-token**, you need it once after installing extension, you'll see pop-up paste there.
 
 **_Note_**: By miss if you missed pasting api-token, you can add it again by clicking on **_..._** icon which shows on REPOSITORIES title or you can run using command pallette `Shift + CMD + P` -> search for `Travis Client: Set <Community/Enterprise> Token` and hit enter.
 
 ## API-Token setup
-* **Travis Enterprise**
-  - `(Shift + CMD + P)` search `>Travis Client: Set Enterprise Token` and hit enter, `Paste Travis Enterprise api-token` in input field. 
 
-* **Travis Community**
+- **Travis Enterprise**
+
+  - `(Shift + CMD + P)` search `>Travis Client: Set Enterprise Token` and hit enter, `Paste Travis Enterprise api-token` in input field.
+
+- **Travis Community**
   - `(Shift + CMD + P)` search `>Travis Client: Set Community Token` and hit enter, `Paste Travis Community api-token` in input field.
 
 This extension contributes the following settings:
 
-* `travisClient.owner`: owner name or organization name, (_It's not github email id_).
+- `travisClient.owner`: owner name or organization name, (_It's not github email id_).
 
   - `owner`: Name in travis account
-* `travisClient.branches`: want's to see only these branches build status, default it'll show all branches
-* `travisClient.pro`: enables travis enterprise mode, which need to private repositories, for enterprise mode you need enterprise [api token](https://travis-ci.com/account/preferences) .
-default value for this is false.
+
+- `travisClient.branches`: want's to see only these branches build status, default it'll show all branches
+- `travisClient.pro`: enables travis enterprise mode, which need to private repositories, for enterprise mode you need enterprise [api token](https://travis-ci.com/account/preferences) .
+  default value for this is false.
 
 For example:
 
-* `"travisClient.owner": "lakkanna"`,
-* `"travisClient.branches": ["master", "sprint"]`,
-* `"travisClient.pro": true`
+- `"travisClient.owner": "lakkanna"`,
+- `"travisClient.branches": ["master", "sprint"]`,
+- `"travisClient.pro": true`
 
 ### Note: If `travisClient.pro` is enabled, should add enterprise api-token.
 
-
-## `If you have any questions feel free to shoot an email:  `lakkannawalikar@gmail.com
+### `If you have any questions feel free to shoot an email: ` lakkannawalikar@gmail.com
 
 ## Release Notes
 
@@ -73,10 +76,11 @@ For example:
 ### 0.0.3
 - Added Travis Enterprise account (for private repository access)
 
+### 0.0.4
+- Check is travis project
+- Auto refresh on configuration changes in **settings.json**
+- Reasonable error messages
 
-
------------------------------------------------------------------------------------------------------------
-
+---
 
 ![feature 1](images/demo1.png)
-

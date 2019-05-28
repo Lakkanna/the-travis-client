@@ -1,52 +1,42 @@
-import * as vscode from 'vscode';
-import * as _ from 'lodash';
-import { RepoNodeProvider } from './nodes/nodeProvider';
-import Repositories from './helpers/repositories';
-import ProjectDetails from './common/ProjectDetails';
+import { commands, ExtensionContext, workspace } from 'vscode';
+import { ProjectDetails } from './common/ProjectDetails';
+import { RepositoryView } from './views/repositoryView';
 
-export function activate(context: vscode.ExtensionContext) {
+export function activate(context: ExtensionContext) {
 
-	let ActiveRepositoryInstance: any;
-	const ProjectDetailsInstance = new ProjectDetails();
+  const ProjectDetailsInstance = new ProjectDetails();
+  const repoView = new RepositoryView(context);
+  const tree = repoView.initialise();
 
-	let disposable = vscode.commands.registerCommand('extension.theTravisClient', () => {
+  const disposable = commands.registerCommand('extension.theTravisClient', () => tree);
 
-		// actuall view creating, calling after getting required data
-		const token = ProjectDetails.getProjectDetails(context).token;
-		if (token) {
-			vscode.window.registerTreeDataProvider('repositories',
-				new RepoNodeProvider([{error: 'Loading: wait a moment..', state: 'loading'}])
-			);
-			const instance = new Repositories(context);
-			instance.loadData();
-		} else {
-			vscode.window.showErrorMessage('You have not added token, please add to get repositories.');
-			vscode.window.registerTreeDataProvider('repositories',
-				new RepoNodeProvider([{error: 'Add api-token: you are not added token yet.!', state: 'info'}])
-			);
-			ProjectDetailsInstance.setAuthToken(context);
-		}
+  const onChangeConfigurationDisposable = workspace.onDidChangeConfiguration((event) => {
+    const onChangeBranches = event.affectsConfiguration('travisClient.branches');
+    const onChangePro = event.affectsConfiguration('travisClient.pro');
+    const onChangeOwner = event.affectsConfiguration('travisClient.owner');
+    if (onChangeBranches || onChangePro || onChangeOwner) {
+      commands.executeCommand('theTravisClient.refresh');
+    }
+  });
 
-	});
+  const setProToken = commands.registerCommand('theTravisClient.setProToken', function() {
+    ProjectDetailsInstance.setAuthToken(context, 'enterprise');
+  });
 
-	const setProToken = vscode.commands.registerCommand('theTravisClient.setProToken', function () {
-		ProjectDetailsInstance.setAuthToken(context, 'enterprise');
-	});
+  const setToken = commands.registerCommand('theTravisClient.setToken', function() {
+    ProjectDetailsInstance.setAuthToken(context, 'community');
+  });
 
-	const setToken = vscode.commands.registerCommand('theTravisClient.setToken', function () {
-		ProjectDetailsInstance.setAuthToken(context, 'community');
-	});
+  const refresh = commands.registerCommand('theTravisClient.refresh', function() {
+    const repoView = new RepositoryView(context);
+    repoView.initialise();
+  });
 
-	const refresh = vscode.commands.registerCommand('theTravisClient.refresh', function () {
-		const instance = new Repositories(context);
-		instance.loadData();
-	});
-
-	context.subscriptions.push(disposable);
-	context.subscriptions.push(setProToken);
-	context.subscriptions.push(setToken);
-	context.subscriptions.push(refresh);
-	vscode.commands.executeCommand('extension.theTravisClient');
+  context.subscriptions.push(disposable);
+  context.subscriptions.push(onChangeConfigurationDisposable);
+  context.subscriptions.push(setProToken);
+  context.subscriptions.push(setToken);
+  context.subscriptions.push(refresh);
 }
 
 // this method is called when your extension is deactivated

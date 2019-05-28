@@ -1,165 +1,181 @@
 {
-	"name": "the-travis-client",
-	"displayName": "The Travis Client",
-	"publisher": "Lakkannawalikar",
-	"description": "Extension to interact with travis build status",
-	"version": "0.0.3",
-	"engines": {
-		"vscode": "^1.34.0"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/Lakkanna/the-travis-client.git"
-	},
-	"icon": "images/icon.png",
-	"galleryBanner": {
-		"color": "#2d2d2d",
-		"theme": "dark"
-	},
-	"keywords": [
-		"travis",
-		"travis status",
-		"travis ci",
-		"the travis",
-		"the travis client",
-		"git",
-		"build",
-		"build status",
-		"repository",
-		"branch",
-		"push",
-		"client",
-		"status",
-		"ci"
-	],
-	"categories": [
-		"Other"
-	],
-	"activationEvents": [
-		"*"
-	],
-	"main": "./out/extension.js",
-	"contributes": {
-		"viewsContainers": {
-			"activitybar": [
-				{
-					"id": "the-travis-client",
-					"title": "The Travis Client",
-					"icon": "images/travis-activitybar-icon.svg"
-				}
-			]
-		},
-		"views": {
-			"the-travis-client": [
-				{
-					"id": "repositories",
-					"name": "Repositories"
-				},
-				{
-					"id": "pullrequests",
-					"name": "Pull Requests"
-				}
-			]
-		},
-		"commands": [
-			{
-				"command": "extension.theTravisClient",
-				"title": "Travis Client: The Travis Client"
-			},
-			{
-				"command": "theTravisClient.setToken",
-				"title": "Travis Client: Set Community Token",
-				"icon": {
-					"light": "images/light/gear.svg",
-					"dark": "images/dark/gear.svg"
-				}
-			},
-			{
-				"command": "theTravisClient.setProToken",
-				"title": "Travis Client: Set Enterprise Token",
-				"icon": {
-					"light": "images/light/gear.svg",
-					"dark": "images/dark/gear.svg"
-				}
-			},
-			{
-				"command": "theTravisClient.refresh",
-				"title": "Travis Client: Refresh",
-				"icon": {
-					"light": "images/light/refresh.svg",
-					"dark": "images/dark/refresh.svg"
-				}
-			}
-		],
-		"menus": {
-			"view/title": [
-				{
-					"command": "theTravisClient.refresh",
-					"group": "navigation"
-				},
-				{
-					"command": "theTravisClient.setProToken",
-					"group": "inline"
-				},
-				{
-					"command": "theTravisClient.setToken",
-					"group": "inline"
-				}
-			]
-		},
-		"configuration": [
-			{
-				"title": "The Travis Client",
-				"properties": {
-					"travisClient.branches": {
-						"type": "array",
-						"default": [
-							"master"
-						],
-						"description": "List of branches to get build status"
-					},
-					"travisClient.owner": {
-						"type": "string",
-						"default": "",
-						"description": "Travis owner for the projects"
-					},
-					"travisClient.pro": {
-						"type": "boolean",
-						"default": false,
-						"description": "Account type community or enterprise"
-					}
-				}
-			}
-		],
-		"keybindings": [
-			{
-				"command": "extension.theTravisClient",
-				"key": "shift+cmd+t",
-				"mac": "shift+cmd+t",
-				"win": "shift+ctrl+t",
-				"linux": "shift+ctrl+t"
-			}
-		]
-	},
-	"scripts": {
-		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
-		"postinstall": "node ./node_modules/vscode/bin/install",
-		"test": "npm run compile && node ./node_modules/vscode/bin/test"
-	},
-	"devDependencies": {
-		"@types/lodash": "4.14.130",
-		"@types/mocha": "^2.2.42",
-		"@types/node": "^10.12.21",
-		"@types/request": "2.48.1",
-		"lodash": "4.17.11",
-		"tslint": "^5.12.1",
-		"typescript": "^3.3.1",
-		"vscode": "^1.1.28"
-	},
-	"dependencies": {
-		"git-rev-2": "0.1.0",
-		"request": "2.88.0"
-	}
+  "name": "the-travis-client",
+  "displayName": "The Travis Client",
+  "publisher": "Lakkannawalikar",
+  "description": "Extension to interact with travis build status",
+  "version": "0.0.4",
+  "engines": {
+    "vscode": "^1.34.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Lakkanna/the-travis-client.git"
+  },
+  "icon": "images/icon.png",
+  "galleryBanner": {
+    "color": "#2d2d2d",
+    "theme": "dark"
+  },
+  "keywords": [
+    "travis",
+    "travis status",
+    "travis ci",
+    "the travis",
+    "the travis client",
+    "git",
+    "build",
+    "build status",
+    "repository",
+    "branch",
+    "push",
+    "client",
+    "status",
+    "ci"
+  ],
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "workspaceContains:.travis.yml",
+    "onView:repositories",
+    "onCommand:extension.theTravisClient"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "the-travis-client",
+          "title": "The Travis Client",
+          "icon": "images/travis-activitybar-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "the-travis-client": [
+        {
+          "id": "repositories",
+          "name": "Repositories"
+        },
+        {
+          "id": "pullrequests",
+          "name": "Pull Requests"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "extension.theTravisClient",
+        "title": "Travis Client: The Travis Client"
+      },
+      {
+        "command": "theTravisClient.setToken",
+        "title": "Travis Client: Set Community Token",
+        "icon": {
+          "light": "images/light/gear.svg",
+          "dark": "images/dark/gear.svg"
+        }
+      },
+      {
+        "command": "theTravisClient.setProToken",
+        "title": "Travis Client: Set Enterprise Token",
+        "icon": {
+          "light": "images/light/gear.svg",
+          "dark": "images/dark/gear.svg"
+        }
+      },
+      {
+        "command": "theTravisClient.refresh",
+        "title": "Travis Client: Refresh",
+        "icon": {
+          "light": "images/light/refresh.svg",
+          "dark": "images/dark/refresh.svg"
+        }
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "theTravisClient.refresh",
+          "group": "navigation"
+        },
+        {
+          "command": "theTravisClient.setProToken",
+          "group": "inline"
+        },
+        {
+          "command": "theTravisClient.setToken",
+          "group": "inline"
+        }
+      ]
+    },
+    "configuration": [
+      {
+        "title": "The Travis Client",
+        "properties": {
+          "travisClient.branches": {
+            "type": "array",
+            "default": [
+              "master"
+            ],
+            "description": "List of branches to get build status"
+          },
+          "travisClient.owner": {
+            "type": "string",
+            "default": "",
+            "description": "Travis owner for the projects"
+          },
+          "travisClient.pro": {
+            "type": "boolean",
+            "default": false,
+            "description": "Account type community or enterprise"
+          }
+        }
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "extension.theTravisClient",
+        "key": "shift+cmd+t",
+        "mac": "shift+cmd+t",
+        "win": "shift+ctrl+t",
+        "linux": "shift+ctrl+t"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src/**/*.ts --fix",
+    "pretty": "prettier --config .prettierrc --loglevel warn --write \"./**/*.{ts,md,json}\" && npm run lint",
+    "pack": "vsce package",
+    "pub": "vsce publish",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "npm run compile && node ./node_modules/vscode/bin/test"
+  },
+  "devDependencies": {
+    "@types/ini": "1.3.30",
+    "@types/lodash": "4.14.130",
+    "@types/mocha": "^2.2.42",
+    "@types/node": "10.14.7",
+    "@types/request": "2.48.1",
+    "@typescript-eslint/eslint-plugin": "1.9.0",
+    "@typescript-eslint/parser": "1.9.0",
+    "axios": "0.18.0",
+    "eslint": "5.16.0",
+    "eslint-cli": "1.1.1",
+    "eslint-config-prettier": "4.3.0",
+    "eslint-plugin-import": "2.17.3",
+    "eslint-plugin-prettiest": "0.0.1",
+    "lodash": "4.17.11",
+    "prettier": "1.17.1",
+    "prettier-eslint": "8.8.2",
+    "tslint": "^5.12.1",
+    "typescript": "^3.3.1",
+    "vscode": "^1.1.28"
+  },
+  "dependencies": {
+    "git-rev-2": "0.1.0"
+  }
 }

@@ -1,54 +1,71 @@
-import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
+import { commands, ExtensionContext, window, workspace } from 'vscode';
 
-interface IKey {
+interface Key {
   [key: string]: any;
 }
 
-interface IObject {
+interface Content {
   storageKey: string;
   base: string;
   prompt: string;
   placeholder: string;
 }
 
-const AccountType: IKey = {
-  'enterprise': {
+const AccountType: Key = {
+  enterprise: {
     storageKey: 'travisProToken',
     base: 'com',
     prompt: 'Please add enterprise auth token for travis client!',
-    placeHolder: 'Add travis enterprise token here',
+    placeHolder: 'Add travis enterprise token here'
   },
-  'community': {
+  community: {
     storageKey: 'travisAuthToken',
     base: 'org',
     prompt: 'Please add community auth token for travis client!',
-    placeHolder: 'Add travis community token here',
+    placeHolder: 'Add travis community token here'
   }
 };
 
-export default class ProjectDetails {
+export class ProjectDetails {
 
-  static getAccountType() {
-    return vscode.workspace.getConfiguration('travisClient').get('pro') === true ? 'enterprise' : 'community';
+  // referenced from felixrieseberg/vsc-travis-ci-status
+  static isTravisProject(): boolean {
+    if (!workspace || !workspace.rootPath) {
+      return false;
+    }
+		const conf = path.join(workspace.rootPath, '.travis.yml');
+
+		try {
+			return fs.statSync(conf).isFile();
+		}
+		catch (err) {
+			return false;
+		}
   }
 
-  static getProjectDetails(context: vscode.ExtensionContext) {
+  static getAccountType() {
+    return workspace.getConfiguration('travisClient').get('pro') === true ? 'enterprise' : 'community';
+  }
+
+  static getProjectDetails(context: ExtensionContext) {
     const currentProjectDetails = AccountType[ProjectDetails.getAccountType()];
     return {
       base: currentProjectDetails.base,
-      token: context.globalState.get(currentProjectDetails.storageKey, ""),
+      token: context.globalState.get(currentProjectDetails.storageKey, ''),
       storageKey: currentProjectDetails.storageKey
     };
   }
 
-  async setAuthToken(context: vscode.ExtensionContext, accountFlavour?:string) {
+  async setAuthToken(context: ExtensionContext, accountFlavour?: string) {
     let type = accountFlavour;
     if (!type) {
       type = ProjectDetails.getAccountType();
     }
 
-    const accountContext: IObject = AccountType[type];
-    const newToken = await vscode.window.showInputBox({
+    const accountContext: Content = AccountType[type];
+    const newToken = await window.showInputBox({
       prompt: accountContext.prompt,
       placeHolder: accountContext.placeholder,
       value: undefined
@@ -56,11 +73,11 @@ export default class ProjectDetails {
 
     if (newToken) {
       context.globalState.update(accountContext.storageKey, newToken);
-      vscode.commands.executeCommand('theTravisClient.refresh');
-      vscode.window.showInformationMessage('You successfully added token, loading repositories wait a moment.');
-    } else {
-      vscode.window.showWarningMessage('You failed to add token, try again (Shift + CMD + P) travis set token');
+      commands.executeCommand('theTravisClient.refresh');
+      window.showInformationMessage('You successfully added token, loading repositories wait a moment.');
+    }
+    else {
+      window.showWarningMessage('You failed to add token, try again (Shift + CMD + P) travis set token');
     }
   }
-
 }

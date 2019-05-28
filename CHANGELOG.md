@@ -1,8 +1,13 @@
 # Change Log
 
 ## [Unreleased]
-
 - Add Pull requests build status
+
+## [0.0.4] - 2019-5-28
+### Added
+- Check is travis project
+- Auto refresh on configuration changes in **settings.json**
+- Reasonable error messages
 
 ## [0.0.3] - 2019-05-24
 ### Added
