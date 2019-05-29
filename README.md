@@ -84,6 +84,8 @@ For example:
 ### 0.0.5
 - Added status bar item to show active repositories, active branch last build status
 
+### 0.0.6
+- Fixed activation events
 ---
 
 ![feature 1](images/demo1.png)

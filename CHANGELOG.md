@@ -3,6 +3,10 @@
 ## [Unreleased]
 - Add Pull requests build status
 
+## [0.0.6] - 2019-05-29
+### Fixed
+- Fixed activation events
+
 ## [0.0.5] - 2019-05-29
 ### Added
 - Status bar item to show active repositories, active branch last build status
