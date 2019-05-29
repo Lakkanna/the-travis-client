@@ -3,7 +3,11 @@
 ## [Unreleased]
 - Add Pull requests build status
 
-## [0.0.4] - 2019-5-28
+## [0.0.5] - 2019-05-29
+### Added
+- Status bar item to show active repositories, active branch last build status
+
+## [0.0.4] - 2019-05-28
 ### Added
 - Check is travis project
 - Auto refresh on configuration changes in **settings.json**

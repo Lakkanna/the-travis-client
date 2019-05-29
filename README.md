@@ -81,6 +81,9 @@ For example:
 - Auto refresh on configuration changes in **settings.json**
 - Reasonable error messages
 
+### 0.0.5
+- Added status bar item to show active repositories, active branch last build status
+
 ---
 
 ![feature 1](images/demo1.png)

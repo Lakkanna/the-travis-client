@@ -7,7 +7,7 @@ const axios = require('axios');
 
 export class Repositories {
 
-  private ActiveRepositoryInstance: any;
+  private activeRepositoryInstance: any;
   private headers: any;
   private token: string;
   private base: string;
@@ -16,7 +16,7 @@ export class Repositories {
     this.token = '';
     this.base = '';
     if (workspace.rootPath) {
-      this.ActiveRepositoryInstance = new ActiveRepository(workspace.rootPath);
+      this.activeRepositoryInstance = new ActiveRepository(this.context, workspace.rootPath);
       const obj = ProjectDetails.getProjectDetails(this.context);
       this.token = obj.token;
       this.base = obj.base;
@@ -32,7 +32,7 @@ export class Repositories {
     try {
       const response = await axios.get(repositoryURLTemplate({
         base: this.base,
-        owner: this.ActiveRepositoryInstance.username
+        owner: this.activeRepositoryInstance.username
       }), {headers: this.headers});
 
       return response.data.repositories;
