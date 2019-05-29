@@ -86,6 +86,9 @@ For example:
 
 ### 0.0.6
 - Fixed activation events
+
+### 0.0.7
+- Fixed extension activation problem
 ---
 
 ![feature 1](images/demo1.png)

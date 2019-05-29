@@ -3,6 +3,9 @@
 ## [Unreleased]
 - Add Pull requests build status
 
+## [0.0.7] - 2019-05-29
+- Fixed extension activation problem
+
 ## [0.0.6] - 2019-05-29
 ### Fixed
 - Fixed activation events
