@@ -1,16 +1,21 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { window, workspace } from 'vscode';
+import { ExtensionContext, window, workspace } from 'vscode';
 import * as _ from 'lodash';
 import * as Git from 'git-rev-2';
 import * as ini from 'ini';
+import { ProjectDetails } from './ProjectDetails';
+import { repositoryURLTemplate } from './apiTemplates';
+
+const axios = require('axios');
 
 export class ActiveRepository {
   private _username = '';
   private _repositoryName = '';
+  private _repoId: string | number | undefined;
   private _activeBranch = '';
 
-  constructor(private path: string) {
+  constructor(private context: ExtensionContext, private path: string) {
     const owner = workspace.getConfiguration('travisClient').get<string>('owner');
     if (_.isEmpty(owner)) {
       [this._username, this._repositoryName] = this.setRepositoryDetails();
@@ -21,10 +26,23 @@ export class ActiveRepository {
     }
 
     this.getActiveBranch();
+    this.getRepositoryIdFromTravis();
   }
 
   get repository() {
     return this._repositoryName;
+  }
+
+  static headers(context: ExtensionContext) {
+    return {
+      'Travis-API-Version': '3',
+      'User-Agent': 'VSCode the-travis-client',
+      Authorization: `token ${ProjectDetails.getProjectDetails(context).token}`
+    };
+  }
+
+  get repositoryId() {
+    return this._repoId;
   }
 
   get username() {
@@ -65,5 +83,25 @@ export class ActiveRepository {
     Git.branch(this.path, (err: never, activeBranch: string) => {
       this._activeBranch = activeBranch;
     });
+  }
+
+  async getRepositoryIdFromTravis() {
+    const response = await axios.get(repositoryURLTemplate({
+      base: ProjectDetails.getProjectDetails(this.context).base,
+      owner: this._username
+    }), {headers: ActiveRepository.headers});
+
+    const repo: any = _.head(_.filter(response.data.repositories, (repo) => repo.name === this._repositoryName));
+    this._repoId = repo.id;
+    return repo;
+  }
+  async getActiveRepositoryDetails() {
+    const headers = ActiveRepository.headers(this.context);
+
+    const response = await axios(repositoryURLTemplate({
+      base: ProjectDetails.getProjectDetails(this.context).base,
+      owner: this._username
+    }), {headers: headers});
+    return _.head(_.filter(response.data.repositories, (repo) => repo.name === this._repositoryName));
   }
 }
