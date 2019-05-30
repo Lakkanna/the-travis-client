@@ -1,29 +1,22 @@
 import { ExtensionContext, workspace } from 'vscode';
 import * as _ from 'lodash';
 import { branchesURLTemplate, buildsURLTemplate, repositoryURLTemplate } from '../common/apiTemplates';
-import { ActiveRepository } from '../common/ActiveRepository';
-import { ProjectDetails } from '../common/ProjectDetails';
+import { ActiveRepositorySingleton } from '../common/ActiveRepositorySingleton';
 const axios = require('axios');
 
 export class Repositories {
 
-  private activeRepositoryInstance: any;
+  private singleton: any;
   private headers: any;
-  private token: string;
-  private base: string;
 
   constructor(private context: ExtensionContext) {
-    this.token = '';
-    this.base = '';
     if (workspace.rootPath) {
-      this.activeRepositoryInstance = new ActiveRepository(this.context, workspace.rootPath);
-      const obj = ProjectDetails.getProjectDetails(this.context);
-      this.token = obj.token;
-      this.base = obj.base;
+      this.singleton = ActiveRepositorySingleton.getInstance();
+      
       this.headers = {
         'Travis-API-Version': '3',
         'User-Agent': 'VSCode the-travis-client',
-        Authorization: `token ${this.token}`
+        Authorization: `token ${this.singleton.token()}`
       };
     }
   }
@@ -31,8 +24,8 @@ export class Repositories {
   async getRepositories() {
     try {
       const response = await axios.get(repositoryURLTemplate({
-        base: this.base,
-        owner: this.activeRepositoryInstance.username
+        base: this.singleton.base(),
+        owner: this.singleton.owner()
       }), {headers: this.headers});
 
       return response.data.repositories;
@@ -48,7 +41,7 @@ export class Repositories {
 
       const branchesPromise = _.map(repos, async rep => {
         try {
-          const response = await axios.get(branchesURLTemplate({ base: this.base, repoId: rep.id }), {headers: this.headers});
+          const response = await axios.get(branchesURLTemplate({ base: this.singleton.base(), repoId: rep.id }), {headers: this.headers});
           return response.data.branches;
         }
         catch (e) {
@@ -80,7 +73,7 @@ export class Repositories {
       const buildsPromise = _.map(filteredBranches, async br => {
         try {
           const response = await axios.get(
-            buildsURLTemplate({ base: this.base, repoId: _.get(br, 'repository.id'), branch: _.get(br, 'name') }),
+            buildsURLTemplate({ base: this.singleton.base(), repoId: _.get(br, 'repository.id'), branch: _.get(br, 'name') }),
             {headers: this.headers}
           );
           return response.data.builds;

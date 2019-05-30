@@ -3,6 +3,17 @@
 ## [Unreleased]
 - Add Pull requests build status
 
+## [0.0.9] - 2019-05-31
+### Security
+- Updated devDependencies reason _(axios)_ vulnerability.
+
+## [0.0.8] - 2019-05-31
+### Added
+- Auto refresh after given interval _(default: 5 minutes)_
+  ```json
+  "travisClient.interval": 5
+  ```
+  
 ## [0.0.7] - 2019-05-29
 - Fixed extension activation problem
 

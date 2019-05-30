@@ -1,5 +1,5 @@
 import { ExtensionContext, window } from 'vscode';
-import { RepoNodeProvider } from '../nodes/nodeProvider';
+import { RepoNodeProvider } from '../nodes/repositoryNodeProvider';
 
 export class RepositoryView {
   private repoNodeProvider: any;

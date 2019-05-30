@@ -1,23 +1,21 @@
 import * as path from 'path';
-import { Command, Event, EventEmitter, ExtensionContext, TreeDataProvider, TreeItem, TreeItemCollapsibleState, window, workspace } from 'vscode';
+import { Command, Event, EventEmitter, ExtensionContext, TreeDataProvider,
+  TreeItem, TreeItemCollapsibleState, window, workspace } from 'vscode';
 import * as _ from 'lodash';
 import { Repositories } from '../helpers/repositories';
-import { ActiveRepository } from '../common/ActiveRepository';
-import { ProjectDetails } from '../common/ProjectDetails';
+import { ActiveRepositorySingleton } from '../common/ActiveRepositorySingleton';
 
 export class RepoNodeProvider implements TreeDataProvider<Dependency> {
   private _onDidChangeTreeData: EventEmitter<Dependency | undefined> = new EventEmitter<Dependency | undefined>();
   readonly onDidChangeTreeData: Event<Dependency | undefined> = this._onDidChangeTreeData.event;
 
   public repoInstance: any;
-  public activeRepositoryInstance: any;
-  public projectDetailsInstance: any;
+  public singleton: any;
 
   constructor(private context: ExtensionContext) {
     this.repoInstance = new Repositories(this.context);
     if (workspace.rootPath) {
-      this.activeRepositoryInstance = new ActiveRepository(this.context, workspace.rootPath);
-      this.projectDetailsInstance = new ProjectDetails();
+      this.singleton = ActiveRepositorySingleton.getInstance();
     }
   }
 
@@ -61,7 +59,7 @@ export class RepoNodeProvider implements TreeDataProvider<Dependency> {
         if (_.isArray(element.prevData.data)) {
           return new Dependency(this.getTimeInfo(d), d.state, d.id, d, TreeItemCollapsibleState.None);
         }
-        return new Dependency(k, 'branch', k, {data: d}, this.activeRepositoryInstance.branch === k ? TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
+        return new Dependency(k, 'branch', k, {data: d}, this.singleton.branch() === k ? TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
 
       });
       
@@ -79,7 +77,7 @@ export class RepoNodeProvider implements TreeDataProvider<Dependency> {
         }))
         .value();
         return _.map(preparedData, eachData => {
-          return new Dependency(eachData.name, eachData.state, eachData.name, eachData, this.activeRepositoryInstance.repository === eachData.name ? TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
+          return new Dependency(eachData.name, eachData.state, eachData.name, eachData, this.singleton.repository() === eachData.name ? TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
         });
       }
       catch (e) {
@@ -100,14 +98,14 @@ export class RepoNodeProvider implements TreeDataProvider<Dependency> {
   }
 
   async getChildren(element?: Dependency): Promise<any> {
-    if (ProjectDetails.isTravisProject()) {
-      const token = ProjectDetails.getProjectDetails(this.context).token;
+    if (workspace.rootPath && this.singleton && this.singleton.isTravisProject()) {
+      const token = this.singleton.token();
       if (token) {
         const data = await this.getPreparedData(element);
         return data;
       } 
       window.showErrorMessage('You have not added token, please add to get repositories.');
-      this.projectDetailsInstance.setAuthToken(this.context);
+      this.singleton.setAuthToken();
       return [new Dependency('Add api-token', 'info', 'api', {}, TreeItemCollapsibleState.None)];
       
     }
