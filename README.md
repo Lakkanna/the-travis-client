@@ -98,6 +98,10 @@ For example:
 
 ### 0.0.8
 - Added auto refresh, refresh after time interval _(unit: minutes)_, default interval is 5 minutes
+
+### 0.0.9
+- Updated devDependencies reason _(axios)_ vulnerability.
+
 ---
 
 ![feature 1](images/demo1.png)
