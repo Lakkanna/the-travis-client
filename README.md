@@ -24,11 +24,12 @@ Lists last 10 builds for each branch for all repositories you own or organizatio
 
 ## Extension Settings
 
-Extension requires three settings
+Extension requires four settings
 
 - **owner/organization name** _(mandatory)_
 - **api-token** _(mandatory)_: this you will find in travis account settings,
 - **branches** _(optional)_ if you not added branches it show status for all branches.
+- **interval** _(optional)_ for auto refersh (defautl 5 minutes)
 
 Copy **api-token**, you need it once after installing extension, you'll see pop-up paste there.
 
@@ -53,11 +54,16 @@ This extension contributes the following settings:
 - `travisClient.pro`: enables travis enterprise mode, which need to private repositories, for enterprise mode you need enterprise [api token](https://travis-ci.com/account/preferences) .
   default value for this is false.
 
+- `travisClient.interval`: time interval for auto refresh data. interval in minuts _(default: 5 minutes)_
+
 For example:
 
-- `"travisClient.owner": "lakkanna"`,
-- `"travisClient.branches": ["master", "sprint"]`,
-- `"travisClient.pro": true`
+  ```json
+    "travisClient.owner": "lakkanna",
+    "travisClient.branches": ["master", "sprint"],
+    "travisClient.pro": true,
+    "travisClient.interval": 6
+  ```
 
 ### Note: If `travisClient.pro` is enabled, should add enterprise api-token.
 
@@ -89,6 +95,9 @@ For example:
 
 ### 0.0.7
 - Fixed extension activation problem
+
+### 0.0.8
+- Added auto refresh, refresh after time interval _(unit: minutes)_, default interval is 5 minutes
 ---
 
 ![feature 1](images/demo1.png)
