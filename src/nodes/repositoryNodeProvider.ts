@@ -84,15 +84,15 @@ export class RepoNodeProvider implements TreeDataProvider<Dependency> {
       catch (e) {
         if (e.response.status === 403) {
           window.showErrorMessage('Authentication error: invalid token');
-          return Promise.resolve([new Dependency('Api token error!', 'errored', 'api token', {}, TreeItemCollapsibleState.None)]);
+          return Promise.resolve([new Dependency('Api token error!', 'errored', 'api token', {},TreeItemCollapsibleState.None, 'no-dependency')]);
         }
         else if (e.response.status === 404) {
           window.showErrorMessage('Owner/Repository not found!');
-          return Promise.resolve([new Dependency('Owner/Repository not found!', 'errored', 'owner/repository not found', {}, TreeItemCollapsibleState.None)]);
+          return Promise.resolve([new Dependency('Owner/Repository not found!', 'errored', 'owner/repository not found', {}, TreeItemCollapsibleState.None, 'no-dependency')]);
         }
         
         window.showErrorMessage(e.message);
-        return Promise.resolve([new Dependency(e.message, 'errored', e.response.status, {}, TreeItemCollapsibleState.None)]);
+        return Promise.resolve([new Dependency(e.message, 'errored', e.response.status, {}, TreeItemCollapsibleState.None, 'no-dependency')]);
         
       }
     
@@ -107,12 +107,12 @@ export class RepoNodeProvider implements TreeDataProvider<Dependency> {
       } 
       window.showErrorMessage('You have not added token, please add to get repositories.');
       this.singleton.setAuthToken();
-      return [new Dependency('Add api-token', 'info', 'api', {}, TreeItemCollapsibleState.None)];
+      return [new Dependency('Add api-token', 'info', 'api', {}, TreeItemCollapsibleState.None, 'no-dependency')];
       
     }
 
     window.showErrorMessage('This is not a travis project!');
-    return [new Dependency('Not a travis project', 'errored', 'not a travis project', {}, TreeItemCollapsibleState.None)];
+    return [new Dependency('Not a travis project', 'errored', 'not a travis project', {}, TreeItemCollapsibleState.None, 'no-dependency')];
   }
 }
 
@@ -123,6 +123,7 @@ export class Dependency extends TreeItem {
     private buildId: string,
     public prevData: any,
     public readonly collapsibleState: TreeItemCollapsibleState,
+    public ctxValue?: any,
     public readonly command?: Command
   ) {
     super(label, collapsibleState);
@@ -203,5 +204,6 @@ export class Dependency extends TreeItem {
   }
 
   iconPath = this.getIconPath();
-  contextValue = this.state === 'branch' || this.state === 'repository' ? 'no-dependency' : 'dependency';
+
+  contextValue = this.ctxValue ? this.ctxValue : _.includes(['repository', 'branch', 'info', 'loading'], this.state) ? 'no-dependency' : 'dependency';
 }

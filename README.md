@@ -108,6 +108,8 @@ For example:
 ### 0.1.1
 - Fixed extension activation problem fixed
 
+### 0.1.2
+- Fixed action (Restart/Cancel)  disabled for auth token error in view/context/item
 ---
 
 ![feature 1](images/demo1.png)

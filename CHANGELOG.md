@@ -3,6 +3,10 @@
 ## [Unreleased]
 - Add Pull requests build status
 
+## [0.1.2] - 2019-05-31
+### Fixed
+- Actions (Restart/Cancel) disabled for auth token error in view/context/item
+
 ## [0.1.1] - 2019-05-31
 ### Fixed
 - Extension activation problem fixed
