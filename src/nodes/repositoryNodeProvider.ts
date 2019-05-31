@@ -32,7 +32,8 @@ export class RepoNodeProvider implements TreeDataProvider<Dependency> {
       passed: 'finished_at',
       started: 'started_at',
       errored: 'started_at',
-      failed: 'finished_at'
+      failed: 'finished_at',
+      canceled: 'updated_at'
     };
     const time = new Date(_.get(data, [_.get(timeEnum, [data.state])])).toLocaleString();
     let duration: string;
@@ -173,6 +174,11 @@ export class Dependency extends TreeItem {
           dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'stop.svg'),
           light: path.join(__filename, '..', '..', '..', 'images', 'color', 'stop.svg')
         };
+        case 'canceled':
+          return {
+            dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'circle-slash.svg'),
+            light: path.join(__filename, '..', '..', '..', 'images', 'color', 'circle-slash.svg')
+          };
       case 'branch':
         return {
           dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'branch.svg'),
@@ -197,5 +203,5 @@ export class Dependency extends TreeItem {
   }
 
   iconPath = this.getIconPath();
-  contextValue = 'dependency';
+  contextValue = this.state === 'branch' || this.state === 'repository' ? 'no-dependency' : 'dependency';
 }

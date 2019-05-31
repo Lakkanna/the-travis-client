@@ -102,6 +102,9 @@ For example:
 ### 0.0.9
 - Updated devDependencies reason _(axios)_ vulnerability.
 
+### 0.1.0
+- Added individual build *Restart* and build *Cancel*
+
 ---
 
 ![feature 1](images/demo1.png)

@@ -3,6 +3,11 @@
 ## [Unreleased]
 - Add Pull requests build status
 
+## [0.1.0] - 2019-05-31
+### Added
+- **Build Restart**: restarts individual build for already created
+- **Build Cancel**: cancels individual build for already running or created build
+
 ## [0.0.9] - 2019-05-31
 ### Security
 - Updated devDependencies reason _(axios)_ vulnerability.
