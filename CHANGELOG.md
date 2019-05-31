@@ -3,6 +3,10 @@
 ## [Unreleased]
 - Add Pull requests build status
 
+## [0.1.1] - 2019-05-31
+### Fixed
+- Extension activation problem fixed
+
 ## [0.1.0] - 2019-05-31
 ### Added
 - **Build Restart**: restarts individual build for already created

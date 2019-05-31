@@ -40,7 +40,9 @@ export function activate(context: ExtensionContext) {
     commands.executeCommand('theTravisClient.refresh');
   };
 
-  const autoRefreshInterval = setInterval(autoRefresh, singletonInstance.interval());
+  if (singletonInstance && singletonInstance.interval()) {
+    const autoRefreshInterval = setInterval(autoRefresh, singletonInstance.interval());
+  }
 
   const refresh = commands.registerCommand('theTravisClient.refresh', () => {
     const repoView = new RepositoryView(context);
