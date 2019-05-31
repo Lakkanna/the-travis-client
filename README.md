@@ -105,6 +105,9 @@ For example:
 ### 0.1.0
 - Added individual build *Restart* and build *Cancel*
 
+### 0.1.1
+- Fixed extension activation problem fixed
+
 ---
 
 ![feature 1](images/demo1.png)

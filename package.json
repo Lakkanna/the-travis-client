@@ -3,7 +3,7 @@
   "displayName": "The Travis Client",
   "publisher": "Lakkannawalikar",
   "description": "Extension to interact with travis build status",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "engines": {
     "vscode": "^1.34.0"
   },
@@ -36,9 +36,7 @@
     "Other"
   ],
   "activationEvents": [
-    "workspaceContains:.travis.yml",
-    "onView:repositories",
-    "onCommand:extension.theTravisClient"
+    "*"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -189,26 +187,29 @@
   },
   "devDependencies": {
     "@types/ini": "1.3.30",
-    "@types/lodash": "4.14.130",
-    "@types/mocha": "2.2.48",
-    "@types/node": "10.14.7",
+    "@types/lodash": "4.14.133",
+    "@types/mocha": "5.2.7",
+    "@types/node": "12.0.4",
     "@types/request": "2.48.1",
     "@typescript-eslint/eslint-plugin": "1.9.0",
     "@typescript-eslint/parser": "1.9.0",
-    "axios": "0.18.0",
     "eslint": "5.16.0",
     "eslint-cli": "1.1.1",
     "eslint-config-prettier": "4.3.0",
     "eslint-plugin-import": "2.17.3",
     "eslint-plugin-prettiest": "0.0.1",
-    "lodash": "4.17.11",
     "prettier": "1.17.1",
     "prettier-eslint": "8.8.2",
-    "tslint": "^5.12.1",
+    "tslint": "5.17.0",
     "typescript": "3.5.1",
     "vscode": "^1.1.28"
   },
   "dependencies": {
-    "git-rev-2": "0.1.0"
+    "axios": "0.19.0",
+    "git-rev-2": "0.1.0",
+    "ini": "1.3.5",
+    "lodash": "4.17.11",
+    "request": "2.88.0",
+    "travis-ci": "2.2.0"
   }
 }
