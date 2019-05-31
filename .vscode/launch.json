@@ -6,6 +6,18 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Webpack Extension Tests",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "npm: test-compile"
+    },
+    {
       "name": "Run Extension",
       "type": "extensionHost",
       "request": "launch",

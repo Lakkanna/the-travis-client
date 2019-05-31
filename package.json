@@ -3,7 +3,7 @@
   "displayName": "The Travis Client",
   "publisher": "Lakkannawalikar",
   "description": "Extension to interact with travis build status",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "engines": {
     "vscode": "^1.34.0"
   },
@@ -38,7 +38,7 @@
   "activationEvents": [
     "*"
   ],
-  "main": "./out/extension.js",
+  "main": "./dist/extension",
   "contributes": {
     "viewsContainers": {
       "activitybar": [
@@ -175,9 +175,10 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "webpack --mode production",
+    "compile": "webpack --mode none",
+    "watch": "webpack --mode none --watch",
+    "test-compile": "tsc -p ./",
     "lint": "eslint src/**/*.ts --fix",
     "pretty": "prettier --config .prettierrc --loglevel warn --write \"./**/*.{ts,md,json}\" && npm run lint",
     "pack": "vsce package",
@@ -193,23 +194,25 @@
     "@types/request": "2.48.1",
     "@typescript-eslint/eslint-plugin": "1.9.0",
     "@typescript-eslint/parser": "1.9.0",
+    "axios": "0.19.0",
     "eslint": "5.16.0",
     "eslint-cli": "1.1.1",
     "eslint-config-prettier": "4.3.0",
+    "eslint-loader": "2.1.2",
     "eslint-plugin-import": "2.17.3",
     "eslint-plugin-prettiest": "0.0.1",
-    "prettier": "1.17.1",
-    "prettier-eslint": "8.8.2",
-    "tslint": "5.17.0",
-    "typescript": "3.5.1",
-    "vscode": "^1.1.28"
-  },
-  "dependencies": {
-    "axios": "0.19.0",
-    "git-rev-2": "0.1.0",
     "ini": "1.3.5",
     "lodash": "4.17.11",
-    "request": "2.88.0",
-    "travis-ci": "2.2.0"
+    "prettier": "1.17.1",
+    "prettier-eslint": "8.8.2",
+    "ts-loader": "6.0.2",
+    "tslint": "5.17.0",
+    "typescript": "3.5.1",
+    "vscode": "^1.1.28",
+    "webpack": "4.32.2",
+    "webpack-cli": "3.3.2"
+  },
+  "dependencies": {
+    "git-rev-2": "0.1.0"
   }
 }
