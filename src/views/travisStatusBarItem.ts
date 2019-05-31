@@ -50,6 +50,8 @@ export class TravisStatusBar {
         return 'x';
       case 'errored':
         return 'x';
+      case 'canceled':
+        return 'circle-slash';
       default:
         return '';
     }

@@ -12,12 +12,7 @@ export class Repositories {
   constructor(private context: ExtensionContext) {
     if (workspace.rootPath) {
       this.singleton = ActiveRepositorySingleton.getInstance();
-      
-      this.headers = {
-        'Travis-API-Version': '3',
-        'User-Agent': 'VSCode the-travis-client',
-        Authorization: `token ${this.singleton.token()}`
-      };
+      this.headers = this.singleton.headers();
     }
   }
 
@@ -88,6 +83,7 @@ export class Repositories {
       return Promise.reject(e);
     }
   }
+
   async loadData() {
     const finalData = await this.getBuilds();
     return finalData;

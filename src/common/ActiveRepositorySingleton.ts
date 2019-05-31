@@ -111,20 +111,6 @@ export class ActiveRepositorySingleton {
     }
   }
 
-  public getRepositoryIdFromTravis2() {
-    axios.get(repositoryURLTemplate({
-      base: this.base(),
-      owner: this.owner(),
-    }), {headers: this.headers()})
-    .then((response: any) => {
-      const repo: any = _.head(_.filter(response.data.repositories, (repo) => repo.name === this.repository()));
-      this._repositoryId = repo.id;
-    })
-    .catch((e: never) => {
-      window.showErrorMessage(e);
-    });
-  }
-
   private getProjectDetails(context: ExtensionContext = this.context) {
     const currentProjectDetails = AccountType[this.accountType()];
     return {
