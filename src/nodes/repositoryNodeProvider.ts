@@ -1,4 +1,3 @@
-import * as path from 'path';
 import { Command, Event, EventEmitter, ExtensionContext, TreeDataProvider,
   TreeItem, TreeItemCollapsibleState, window, workspace } from 'vscode';
 import * as _ from 'lodash';
@@ -58,9 +57,9 @@ export class RepoNodeProvider implements TreeDataProvider<Dependency> {
       } 
       return _.map(element.prevData.data, (d: any, k) => {
         if (_.isArray(element.prevData.data)) {
-          return new Dependency(this.getTimeInfo(d), d.state, d.id, d, TreeItemCollapsibleState.None);
+          return new Dependency(this.context, this.getTimeInfo(d), d.state, d.id, d, TreeItemCollapsibleState.None);
         }
-        return new Dependency(k, 'branch', k, {data: d}, this.singleton.branch() === k ? TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
+        return new Dependency(this.context, k, 'branch', k, {data: d}, this.singleton.branch() === k ? TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
 
       });
       
@@ -78,21 +77,21 @@ export class RepoNodeProvider implements TreeDataProvider<Dependency> {
         }))
         .value();
         return _.map(preparedData, eachData => {
-          return new Dependency(eachData.name, eachData.state, eachData.name, eachData, this.singleton.repository() === eachData.name ? TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
+          return new Dependency(this.context, eachData.name, eachData.state, eachData.name, eachData, this.singleton.repository() === eachData.name ? TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
         });
       }
       catch (e) {
         if (e.response.status === 403) {
           window.showErrorMessage('Authentication error: invalid token');
-          return Promise.resolve([new Dependency('Api token error!', 'errored', 'api token', {},TreeItemCollapsibleState.None, 'no-dependency')]);
+          return Promise.resolve([new Dependency(this.context, 'Api token error!', 'errored', 'api token', {},TreeItemCollapsibleState.None, 'no-dependency')]);
         }
         else if (e.response.status === 404) {
           window.showErrorMessage('Owner/Repository not found!');
-          return Promise.resolve([new Dependency('Owner/Repository not found!', 'errored', 'owner/repository not found', {}, TreeItemCollapsibleState.None, 'no-dependency')]);
+          return Promise.resolve([new Dependency(this.context, 'Owner/Repository not found!', 'errored', 'owner/repository not found', {}, TreeItemCollapsibleState.None, 'no-dependency')]);
         }
         
         window.showErrorMessage(e.message);
-        return Promise.resolve([new Dependency(e.message, 'errored', e.response.status, {}, TreeItemCollapsibleState.None, 'no-dependency')]);
+        return Promise.resolve([new Dependency(this.context, e.message, 'errored', e.response.status, {}, TreeItemCollapsibleState.None, 'no-dependency')]);
         
       }
     
@@ -107,24 +106,25 @@ export class RepoNodeProvider implements TreeDataProvider<Dependency> {
       } 
       window.showErrorMessage('You have not added token, please add to get repositories.');
       this.singleton.setAuthToken();
-      return [new Dependency('Add api-token', 'info', 'api', {}, TreeItemCollapsibleState.None, 'no-dependency')];
+      return [new Dependency(this.context, 'Add api-token', 'info', 'api', {}, TreeItemCollapsibleState.None, 'no-dependency')];
       
     }
 
     window.showErrorMessage('This is not a travis project!');
-    return [new Dependency('Not a travis project', 'errored', 'not a travis project', {}, TreeItemCollapsibleState.None, 'no-dependency')];
+    return [new Dependency(this.context, 'Not a travis project', 'errored', 'not a travis project', {}, TreeItemCollapsibleState.None, 'no-dependency')];
   }
 }
 
 export class Dependency extends TreeItem {
   constructor(
+    private context: ExtensionContext,
     public readonly label: string,
     private state: string,
     private buildId: string,
     public prevData: any,
     public readonly collapsibleState: TreeItemCollapsibleState,
     public ctxValue?: any,
-    public readonly command?: Command
+    public readonly command?: Command,
   ) {
     super(label, collapsibleState);
   }
@@ -147,58 +147,58 @@ export class Dependency extends TreeItem {
     switch (this.state) {
       case 'started':
         return {
-          dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'clock.svg'),
-          light: path.join(__filename, '..', '..', '..', 'images', 'color', 'clock.svg')
+          dark: this.context.asAbsolutePath('images/color/clock.svg'),
+          light: this.context.asAbsolutePath('images/color/clock.svg')
         };
       case 'created':
         return {
-          dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'plus.svg'),
-          light: path.join(__filename, '..', '..', '..', 'images', 'color', 'plus.svg')
+          dark: this.context.asAbsolutePath('images/color/plus.svg'),
+          light: this.context.asAbsolutePath('images/color/plus.svg'),
         };
       case 'running':
         return {
-          dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'clock.svg'),
-          light: path.join(__filename, '..', '..', '..', 'images', 'color', 'clock.svg')
+          dark: this.context.asAbsolutePath('images/color/clock.svg'),
+          light: this.context.asAbsolutePath('images/color/clock.svg')
         };
       case 'passed':
         return {
-          dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'check.svg'),
-          light: path.join(__filename, '..', '..', '..', 'images', 'color', 'check.svg')
+          dark: this.context.asAbsolutePath('images/color/check.svg'),
+          light: this.context.asAbsolutePath('images/color/check.svg')
         };
       case 'failed':
         return {
-          dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'x.svg'),
-          light: path.join(__filename, '..', '..', '..', 'images', 'color', 'x.svg')
+          dark: this.context.asAbsolutePath('images/color/x.svg'),
+          light: this.context.asAbsolutePath('images/color/x.svg')
         };
       case 'errored':
         return {
-          dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'stop.svg'),
-          light: path.join(__filename, '..', '..', '..', 'images', 'color', 'stop.svg')
+          dark: this.context.asAbsolutePath('images/color/stop.svg'),
+          light: this.context.asAbsolutePath('images/color/stop.svg')
         };
         case 'canceled':
           return {
-            dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'circle-slash.svg'),
-            light: path.join(__filename, '..', '..', '..', 'images', 'color', 'circle-slash.svg')
+            dark: this.context.asAbsolutePath('images/color/circle-slash.svg'),
+            light: this.context.asAbsolutePath('images/color/check.svg'),
           };
       case 'branch':
         return {
-          dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'branch.svg'),
-          light: path.join(__filename, '..', '..', '..', 'images', 'color', 'branch.svg')
+          dark: this.context.asAbsolutePath('images/color/branch.svg'),
+          light: this.context.asAbsolutePath('images/color/branch.svg'),
         };
       case 'loading':
         return {
-          dark: path.join(__filename, '..', '..', '..', 'images', 'dark', 'refresh.svg'),
-          light: path.join(__filename, '..', '..', '..', 'images', 'light', 'refresh.svg')
+          dark: this.context.asAbsolutePath('images/dark/refresh.svg'),
+          light: this.context.asAbsolutePath('images/light/refresh.svg')
         };
       case 'info':
         return {
-          dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'info.svg'),
-          light: path.join(__filename, '..', '..', '..', 'images', 'color', 'info.svg')
+          dark: this.context.asAbsolutePath('images/color/info.svg'),
+          light: this.context.asAbsolutePath('images/color/info.svg'),
         };
       default:
         return {
-          dark: path.join(__filename, '..', '..', '..', 'images', 'color', 'repo.svg'),
-          light: path.join(__filename, '..', '..', '..', 'images', 'color', 'repo.svg')
+          dark: this.context.asAbsolutePath('images/color/repo.svg'),
+          light: this.context.asAbsolutePath('images/color/repo.svg')
         };
     }
   }

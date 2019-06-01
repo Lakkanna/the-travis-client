@@ -42,20 +42,6 @@ const config = {
       },
       {
         test: /\.ts$/,
-        enforce: 'pre',
-        use: [
-          {
-            loader: 'eslint-loader',
-            options: {
-              cache: true,
-              failOnError: true
-            }
-          }
-        ],
-        exclude: /node_modules/
-      },
-      {
-        test: /\.ts$/,
         exclude: /node_modules/,
         use: [
           {
@@ -64,15 +50,6 @@ const config = {
         ]
       }
     ]
-  },
-  stats: {
-    all: false,
-    assets: true,
-    builtAt: true,
-    env: true,
-    errors: true,
-    timings: true,
-    warnings: true
-}
+  }
 };
 module.exports = config;
