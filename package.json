@@ -126,12 +126,12 @@
         {
           "command": "theTravisClient.restart",
           "group": "inline",
-          "when": "view == repositories && viewItem == dependency"
+          "when": "view == repositories && viewItem == build"
         },
         {
           "command": "theTravisClient.cancel",
           "group": "inline",
-          "when": "view == repositories && viewItem == dependency"
+          "when": "view == repositories && viewItem == build"
         }
       ]
     },
