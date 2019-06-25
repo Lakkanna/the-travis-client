@@ -6,12 +6,24 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Webpack Extension Tests",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/dist/test"
+      ],
+      "outFiles": ["${workspaceFolder}/dist/test/**/*.js"],
+      "preLaunchTask": "npm: test-compile"
+    },
+    {
       "name": "Run Extension",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
-      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "outFiles": ["${workspaceFolder}/dist/**/*.js"],
       "preLaunchTask": "npm: watch"
     },
     {
@@ -20,7 +32,7 @@
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": ["--extensionDevelopmentPath=${workspaceFolder}", "--extensionTestsPath=${workspaceFolder}/out/test"],
-      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "outFiles": ["${workspaceFolder}/dist/test/**/*.js"],
       "preLaunchTask": "npm: watch"
     }
   ]

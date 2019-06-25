@@ -1,12 +1,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import axios from 'axios';
 import { commands, ExtensionContext, window, workspace } from 'vscode';
 import * as _ from 'lodash';
 import * as Git from 'git-rev-2';
 import * as ini from 'ini';
 import { repositoryURLTemplate } from '../common/apiTemplates';
-
-const axios = require('axios');
 
 let instance: any;
 
@@ -48,7 +47,8 @@ export class ActiveRepositorySingleton {
   private _storageKey: string | undefined;
   private _timeInterval: number | undefined;
 
-  constructor(private context: ExtensionContext, private _path: string) {}
+  constructor(private context: ExtensionContext, private _path: string) {
+  }
 
   static createInstance = (context: ExtensionContext, repoPath: string) => {
     instance = new ActiveRepositorySingleton(context, repoPath);
@@ -58,6 +58,7 @@ export class ActiveRepositorySingleton {
     if (instance) {
       return instance;
     }
+    return undefined;
   }
 
   // referenced from felixrieseberg/vsc-travis-ci-status

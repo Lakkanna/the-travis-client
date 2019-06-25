@@ -110,6 +110,9 @@ For example:
 
 ### 0.1.2
 - Fixed action (Restart/Cancel)  disabled for auth token error in view/context/item
+
+### 0.1.3
+- Removed unused node_module packages and configured webpack
 ---
 
 ![feature 1](images/demo1.png)
