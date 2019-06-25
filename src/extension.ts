@@ -1,10 +1,9 @@
-import { commands, ExtensionContext, workspace, window } from 'vscode';
-import * as _ from "lodash";
+import { commands, ExtensionContext, window, workspace } from 'vscode';
+import axios from 'axios';
 import { RepositoryView } from './views/repositoryView';
 import { TravisStatusBar } from './views/travisStatusBarItem';
 import { ActiveRepositorySingleton } from './common/ActiveRepositorySingleton';
-const axios = require('axios');
-import { restartBuildTemplate, cancelBuildTemplate } from './common/apiTemplates';
+import { cancelBuildTemplate, restartBuildTemplate } from './common/apiTemplates';
 
 export function activate(context: ExtensionContext) {
 
@@ -12,7 +11,7 @@ export function activate(context: ExtensionContext) {
   let singletonInstance: any;
 
   if (workspace.rootPath) {
-    const singleton = ActiveRepositorySingleton.createInstance(context, workspace.rootPath);
+    ActiveRepositorySingleton.createInstance(context, workspace.rootPath);
     singletonInstance = ActiveRepositorySingleton.getInstance();
   }
 
@@ -21,6 +20,7 @@ export function activate(context: ExtensionContext) {
   const travisStatusBarInstance = new TravisStatusBar(context);
 
   const disposable = commands.registerCommand('extension.theTravisClient', () => tree);
+
   // Configuration change trigger events
   const onChangeConfigurationDisposable = workspace.onDidChangeConfiguration((event) => {
     const onChangeBranches = event.affectsConfiguration('travisClient.branches');
@@ -40,9 +40,13 @@ export function activate(context: ExtensionContext) {
     commands.executeCommand('theTravisClient.refresh');
   };
 
-  if (singletonInstance && singletonInstance.interval()) {
-    const autoRefreshInterval = setInterval(autoRefresh, singletonInstance.interval());
-  }
+  const setAutoRefreshInterval = () => {
+    if (singletonInstance && singletonInstance.interval()) {
+      const autoRefreshInterval = setInterval(autoRefresh, singletonInstance.interval());
+    }
+  };
+
+  setAutoRefreshInterval();
 
   const refresh = commands.registerCommand('theTravisClient.refresh', () => {
     const repoView = new RepositoryView(context);
@@ -97,7 +101,9 @@ export function activate(context: ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() {
+  console.log('Extension the-travis-client deactivating!');
+}
 
 const showErrorMessage = (status: number) => {
   switch(status) {

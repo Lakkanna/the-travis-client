@@ -1,9 +1,8 @@
+import axios from 'axios';
 import * as _ from 'lodash';
 import { ExtensionContext, StatusBarAlignment, StatusBarItem, window, workspace } from 'vscode';
 import { ActiveRepositorySingleton } from '../common/ActiveRepositorySingleton';
 import { buildsURLTemplate } from '../common/apiTemplates';
-
-const axios = require('axios');
 
 export class TravisStatusBar {
   private _statusBarItem: StatusBarItem;

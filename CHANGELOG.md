@@ -3,6 +3,12 @@
 ## [Unreleased]
 - Add Pull requests build status
 
+## [0.1.3] - 2019-06-05
+### Removed
+- Unused node_module packages
+### Added
+- Webpack configuration
+
 ## [0.1.2] - 2019-05-31
 ### Fixed
 - Actions (Restart/Cancel) disabled for auth token error in view/context/item

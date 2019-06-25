@@ -1,8 +1,9 @@
+import axios from 'axios';
 import { ExtensionContext, workspace } from 'vscode';
 import * as _ from 'lodash';
 import { branchesURLTemplate, buildsURLTemplate, repositoryURLTemplate } from '../common/apiTemplates';
 import { ActiveRepositorySingleton } from '../common/ActiveRepositorySingleton';
-const axios = require('axios');
+
 
 export class Repositories {
 
