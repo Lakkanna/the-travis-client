@@ -1,18 +1,21 @@
 import { commands, ExtensionContext, window, workspace } from 'vscode';
 import axios from 'axios';
+import * as _ from 'lodash';
 import { RepositoryView } from './views/repositoryView';
 import { TravisStatusBar } from './views/travisStatusBarItem';
 import { ActiveRepositorySingleton } from './common/ActiveRepositorySingleton';
 import { cancelBuildTemplate, restartBuildTemplate } from './common/apiTemplates';
 
 export function activate(context: ExtensionContext) {
-
   // initialise singleton
   let singletonInstance: any;
 
-  if (workspace.rootPath) {
-    ActiveRepositorySingleton.createInstance(context, workspace.rootPath);
-    singletonInstance = ActiveRepositorySingleton.getInstance();
+  if (workspace.workspaceFolders) {
+    const firstWorkspace = _.first(workspace.workspaceFolders);
+    if (firstWorkspace) {
+      ActiveRepositorySingleton.createInstance(context, firstWorkspace.uri.path);
+      singletonInstance = ActiveRepositorySingleton.getInstance();
+    }
   }
 
   const repoView = new RepositoryView(context);
@@ -22,7 +25,7 @@ export function activate(context: ExtensionContext) {
   const disposable = commands.registerCommand('extension.theTravisClient', () => tree);
 
   // Configuration change trigger events
-  const onChangeConfigurationDisposable = workspace.onDidChangeConfiguration((event) => {
+  const onChangeConfigurationDisposable = workspace.onDidChangeConfiguration(event => {
     const onChangeBranches = event.affectsConfiguration('travisClient.branches');
     const onChangePro = event.affectsConfiguration('travisClient.pro');
     const onChangeOwner = event.affectsConfiguration('travisClient.owner');
@@ -32,17 +35,21 @@ export function activate(context: ExtensionContext) {
     }
   });
 
-  const setProToken = commands.registerCommand('theTravisClient.setProToken', () => singletonInstance.setAuthToken('enterprise'));
+  const setProToken = commands.registerCommand('theTravisClient.setProToken', () =>
+    singletonInstance.setAuthToken('enterprise')
+  );
 
-  const setToken = commands.registerCommand('theTravisClient.setToken', () => singletonInstance.setAuthToken('community'));
+  const setToken = commands.registerCommand('theTravisClient.setToken', () =>
+    singletonInstance.setAuthToken('community')
+  );
 
-  const autoRefresh = function () {
+  const autoRefresh = function() {
     commands.executeCommand('theTravisClient.refresh');
   };
 
   const setAutoRefreshInterval = () => {
     if (singletonInstance && singletonInstance.interval()) {
-      const autoRefreshInterval = setInterval(autoRefresh, singletonInstance.interval());
+      setInterval(autoRefresh, singletonInstance.interval());
     }
   };
 
@@ -54,37 +61,43 @@ export function activate(context: ExtensionContext) {
     travisStatusBarInstance.updateStatusBar(true);
   });
 
-  const restart = commands.registerCommand('theTravisClient.restart', async (data) => {
+  const restart = commands.registerCommand('theTravisClient.restart', async data => {
     if (data && data.buildId) {
       try {
-        const response = await axios.post(restartBuildTemplate({
-          base: singletonInstance.base(),
-          buildId: data.buildId
-        }), {}, {headers: singletonInstance.headers()});
+        const response = await axios.post(
+          restartBuildTemplate({
+            base: singletonInstance.base(),
+            buildId: data.buildId
+          }),
+          {},
+          { headers: singletonInstance.headers() }
+        );
         if (response.status === 202) {
           window.showInformationMessage(`Sucessfully ${data.buildId} build is restarted`);
           commands.executeCommand('theTravisClient.refresh');
         }
-      }
-      catch (e) {
+      } catch (e) {
         showErrorMessage(e.response.status);
       }
     }
   });
 
-  const cancel = commands.registerCommand('theTravisClient.cancel', async (data) => {
+  const cancel = commands.registerCommand('theTravisClient.cancel', async data => {
     if (data && data.buildId) {
       try {
-        const response = await axios.post(cancelBuildTemplate({
-          base: singletonInstance.base(),
-          buildId: data.buildId
-        }), {}, {headers: singletonInstance.headers()});
+        const response = await axios.post(
+          cancelBuildTemplate({
+            base: singletonInstance.base(),
+            buildId: data.buildId
+          }),
+          {},
+          { headers: singletonInstance.headers() }
+        );
         if (response.status === 202) {
           window.showInformationMessage(`Sucessfully ${data.buildId} build is canceled`);
           commands.executeCommand('theTravisClient.refresh');
         }
-      }
-      catch (e) {
+      } catch (e) {
         showErrorMessage(e.response.status);
       }
     }
@@ -97,7 +110,6 @@ export function activate(context: ExtensionContext) {
   context.subscriptions.push(refresh);
   context.subscriptions.push(restart);
   context.subscriptions.push(cancel);
-
 }
 
 // this method is called when your extension is deactivated
@@ -106,7 +118,7 @@ export function deactivate() {
 }
 
 const showErrorMessage = (status: number) => {
-  switch(status) {
+  switch (status) {
     case 403:
       window.showErrorMessage('You do not have permission to restart build!');
       break;

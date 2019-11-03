@@ -1,5 +1,14 @@
-import { Command, Event, EventEmitter, ExtensionContext, TreeDataProvider,
-  TreeItem, TreeItemCollapsibleState, window, workspace } from 'vscode';
+import {
+  Command,
+  Event,
+  EventEmitter,
+  ExtensionContext,
+  TreeDataProvider,
+  TreeItem,
+  TreeItemCollapsibleState,
+  window,
+  workspace
+} from 'vscode';
 import * as _ from 'lodash';
 import { Repositories } from '../helpers/repositories';
 import { ActiveRepositorySingleton } from '../common/ActiveRepositorySingleton';
@@ -13,7 +22,7 @@ export class RepoNodeProvider implements TreeDataProvider<BuildItem> {
 
   constructor(private context: ExtensionContext) {
     this.repoInstance = new Repositories(this.context);
-    if (workspace.rootPath) {
+    if (workspace && workspace.workspaceFolders && workspace.workspaceFolders.length > 0) {
       this.singleton = ActiveRepositorySingleton.getInstance();
     }
   }
@@ -25,7 +34,7 @@ export class RepoNodeProvider implements TreeDataProvider<BuildItem> {
   getTreeItem(element: BuildItem): TreeItem {
     return element;
   }
-  
+
   public getTimeInfo(data: any) {
     const timeEnum = {
       passed: 'finished_at',
@@ -44,7 +53,7 @@ export class RepoNodeProvider implements TreeDataProvider<BuildItem> {
 
       case 'created':
         return 'now created';
-    
+
       default:
         return _.replace(time, /[/]/g, '-');
     }
@@ -54,67 +63,135 @@ export class RepoNodeProvider implements TreeDataProvider<BuildItem> {
     if (element) {
       if (!element.prevData) {
         return [];
-      } 
+      }
       return _.map(element.prevData.data, (d: any, k) => {
         // contextValue: build, builds of branch
         if (_.isArray(element.prevData.data)) {
-          return new BuildItem(this.context, this.getTimeInfo(d), d.state, d.id, d, TreeItemCollapsibleState.None, 'build');
+          return new BuildItem(
+            this.context,
+            this.getTimeInfo(d),
+            d.state,
+            d.id,
+            d,
+            TreeItemCollapsibleState.None,
+            'build'
+          );
         }
         // contextValue: branch, branches of repository
-        return new BuildItem(this.context, k, 'branch', k, {data: d}, this.singleton.branch() === k ? TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed, 'branch');
+        return new BuildItem(
+          this.context,
+          k,
+          'branch',
+          k,
+          { data: d },
+          this.singleton.branch() === k ? TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed,
+          'branch'
+        );
       });
-      
-    } 
+    }
     try {
       const data = await this.repoInstance.loadData();
       const preparedData = _.chain(data)
-      .flatMap()
-      .groupBy('repository.name')
-      .mapValues((v, k) => ({
-        name: k,
-        state: 'repository',
-        id: '',
-        data: {..._.groupBy(v, 'branch.name')}
-      }))
-      .value();
+        .flatMap()
+        .groupBy('repository.name')
+        .mapValues((v, k) => ({
+          name: k,
+          state: 'repository',
+          id: '',
+          data: { ..._.groupBy(v, 'branch.name') }
+        }))
+        .value();
       // contextValue: repository
       return _.map(preparedData, eachData => {
-        return new BuildItem(this.context, eachData.name, eachData.state, eachData.name, eachData, this.singleton.repository() === eachData.name ? TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed, 'repository');
+        return new BuildItem(
+          this.context,
+          eachData.name,
+          eachData.state,
+          eachData.name,
+          eachData,
+          this.singleton.repository() === eachData.name
+            ? TreeItemCollapsibleState.Expanded
+            : TreeItemCollapsibleState.Collapsed,
+          'repository'
+        );
       });
-    }
-    catch (e) {
+    } catch (e) {
       // contextValue: messageNode
       if (e.response.status === 403) {
         window.showErrorMessage('Authentication error: invalid token');
-        return Promise.resolve([new BuildItem(this.context, 'Api token error!', 'errored', 'api token', {},TreeItemCollapsibleState.None, 'messageNode')]);
-      }
-      else if (e.response.status === 404) {
+        return Promise.resolve([
+          new BuildItem(
+            this.context,
+            'Api token error!',
+            'errored',
+            'api token',
+            {},
+            TreeItemCollapsibleState.None,
+            'messageNode'
+          )
+        ]);
+      } else if (e.response.status === 404) {
         window.showErrorMessage('Owner/Repository not found!');
-        return Promise.resolve([new BuildItem(this.context, 'Owner/Repository not found!', 'errored', 'owner/repository not found', {}, TreeItemCollapsibleState.None, 'messageNode')]);
+        return Promise.resolve([
+          new BuildItem(
+            this.context,
+            'Owner/Repository not found!',
+            'errored',
+            'owner/repository not found',
+            {},
+            TreeItemCollapsibleState.None,
+            'messageNode'
+          )
+        ]);
       }
-      
+
       window.showErrorMessage(e.message);
-      return Promise.resolve([new BuildItem(this.context, e.message, 'errored', e.response.status, {}, TreeItemCollapsibleState.None, 'messageNode')]);
-      
+      return Promise.resolve([
+        new BuildItem(
+          this.context,
+          e.message,
+          'errored',
+          e.response.status,
+          {},
+          TreeItemCollapsibleState.None,
+          'messageNode'
+        )
+      ]);
     }
-    
   }
 
   async getChildren(element?: BuildItem): Promise<any> {
-    if (workspace.rootPath && this.singleton && this.singleton.isTravisProject()) {
+    if (
+      workspace &&
+      workspace.workspaceFolders &&
+      workspace.workspaceFolders.length > 0 &&
+      this.singleton &&
+      this.singleton.isTravisProject()
+    ) {
       const token = this.singleton.token();
       if (token) {
         const data = await this.getPreparedData(element);
         return data;
-      } 
+      }
       window.showErrorMessage('You have not added token, please add to get repositories.');
       this.singleton.setAuthToken();
-      return [new BuildItem(this.context, 'Add api-token', 'info', 'api', {}, TreeItemCollapsibleState.None, 'messageNode')];
-      
+      return [
+        new BuildItem(this.context, 'Add api-token', 'info', 'api', {}, TreeItemCollapsibleState.None, 'messageNode')
+      ];
     }
 
     window.showErrorMessage('This is not a travis project!');
-    return [new BuildItem(this.context, 'Not a travis project', 'errored', 'not a travis project', {}, TreeItemCollapsibleState.None, 'messageNode')];
+    return [
+      new BuildItem(
+        this.context,
+        'Not a travis project',
+        'errored',
+        'not a travis project',
+        {},
+        TreeItemCollapsibleState.None,
+        'messageNode'
+      )
+    ];
   }
 }
 
@@ -127,7 +204,7 @@ export class BuildItem extends TreeItem {
     public prevData: any,
     public readonly collapsibleState: TreeItemCollapsibleState,
     public ctxValue?: any,
-    public readonly command?: Command,
+    public readonly command?: Command
   ) {
     super(label, collapsibleState);
   }
@@ -156,7 +233,7 @@ export class BuildItem extends TreeItem {
       case 'created':
         return {
           dark: this.context.asAbsolutePath('images/color/plus.svg'),
-          light: this.context.asAbsolutePath('images/color/plus.svg'),
+          light: this.context.asAbsolutePath('images/color/plus.svg')
         };
       case 'running':
         return {
@@ -178,15 +255,15 @@ export class BuildItem extends TreeItem {
           dark: this.context.asAbsolutePath('images/color/stop.svg'),
           light: this.context.asAbsolutePath('images/color/stop.svg')
         };
-        case 'canceled':
-          return {
-            dark: this.context.asAbsolutePath('images/color/circle-slash.svg'),
-            light: this.context.asAbsolutePath('images/color/check.svg'),
-          };
+      case 'canceled':
+        return {
+          dark: this.context.asAbsolutePath('images/color/circle-slash.svg'),
+          light: this.context.asAbsolutePath('images/color/check.svg')
+        };
       case 'branch':
         return {
           dark: this.context.asAbsolutePath('images/color/branch.svg'),
-          light: this.context.asAbsolutePath('images/color/branch.svg'),
+          light: this.context.asAbsolutePath('images/color/branch.svg')
         };
       case 'loading':
         return {
@@ -196,7 +273,7 @@ export class BuildItem extends TreeItem {
       case 'info':
         return {
           dark: this.context.asAbsolutePath('images/color/info.svg'),
-          light: this.context.asAbsolutePath('images/color/info.svg'),
+          light: this.context.asAbsolutePath('images/color/info.svg')
         };
       default:
         return {

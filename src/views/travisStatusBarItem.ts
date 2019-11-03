@@ -9,7 +9,7 @@ export class TravisStatusBar {
   private singleton: any;
 
   constructor(private context: ExtensionContext) {
-    if (workspace && workspace.rootPath) {
+    if (workspace && workspace.workspaceFolders && workspace.workspaceFolders.length > 0) {
       this.singleton = ActiveRepositorySingleton.getInstance();
     }
     this._statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 100);
@@ -20,7 +20,7 @@ export class TravisStatusBar {
   async loadStatusBarData() {
     const headers = this.singleton.headers();
 
-    const activeRepo = {id: await this.singleton.repositoryId()};
+    const activeRepo = { id: await this.singleton.repositoryId() };
 
     const response = await axios.get(
       buildsURLTemplate({
@@ -28,13 +28,17 @@ export class TravisStatusBar {
         repoId: _.get(activeRepo, 'id'),
         branch: this.singleton.branch()
       }),
-    {headers: headers}
+      { headers: headers }
     );
 
     const build: any = _.head(_.get(response, 'data.builds'));
-    const statusData = await {id: build.id, repoName: this.singleton.repository(), branchName: this.singleton.branch(), state: build.state};
+    const statusData = await {
+      id: build.id,
+      repoName: this.singleton.repository(),
+      branchName: this.singleton.branch(),
+      state: build.state
+    };
     return statusData;
-
   }
 
   public getStatusIcon(state: string) {
@@ -56,7 +60,7 @@ export class TravisStatusBar {
     }
   }
 
-  async updateStatusBar(refresh: boolean = false) {
+  async updateStatusBar(refresh = false) {
     if (this.singleton && this.singleton.isTravisProject()) {
       if (refresh) {
         this._statusBarItem.text = 'Travis: $(sync~spin)';
@@ -69,8 +73,7 @@ export class TravisStatusBar {
         this._statusBarItem.text = `Travis: ${data.repoName}: $(${this.getStatusIcon(data.state)})`;
         this._statusBarItem.tooltip = `${data.branchName}: ${data.id} - ${data.state}`;
         this.show();
-      }
-      catch (e) {
+      } catch (e) {
         console.error(e);
         this.hide();
       }

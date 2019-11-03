@@ -37,49 +37,51 @@ const AccountType: Key = {
 
 export class ActiveRepositorySingleton {
   private _branch: string | undefined;
-  private _repository: string |undefined;
+  private _repository: string | undefined;
   private _repositoryId: string | number | undefined;
   private _owner: string | undefined;
   private _isTravisProject: boolean | undefined;
-  private _accountType: string = '';
+  private _accountType = '';
   private _base: string | undefined;
   private _token: string | undefined;
   private _storageKey: string | undefined;
   private _timeInterval: number | undefined;
 
-  constructor(private context: ExtensionContext, private _path: string) {
-  }
+  constructor(private context: ExtensionContext, private _path: string) {}
 
   static createInstance = (context: ExtensionContext, repoPath: string) => {
     instance = new ActiveRepositorySingleton(context, repoPath);
-  }
+  };
 
   static getInstance = () => {
     if (instance) {
       return instance;
     }
     return undefined;
-  }
+  };
 
   // referenced from felixrieseberg/vsc-travis-ci-status
   private static isTravisProject(): boolean {
-    if (!workspace || !workspace.rootPath) {
+    if (!workspace) {
       return false;
     }
-    const conf = path.join(workspace.rootPath, '.travis.yml');
+    if (workspace && workspace.workspaceFolders && workspace.workspaceFolders.length > 0) {
+      const work = workspace.workspaceFolders[0];
 
-    try {
-      return fs.statSync(conf).isFile();
+      const conf = path.join(work.uri.path, '.travis.yml');
+      try {
+        return fs.statSync(conf).isFile();
+      } catch (err) {
+        return false;
+      }
     }
-    catch (err) {
-      return false;
-    }
+    return false;
   }
 
   private static getAccountType() {
     return workspace.getConfiguration('travisClient').get('pro') === true ? 'enterprise' : 'community';
   }
-  
+
   public interval() {
     if (!this._timeInterval) {
       this.setDetails(this._path);
@@ -97,16 +99,18 @@ export class ActiveRepositorySingleton {
 
   async getRepositoryIdFromTravis() {
     try {
-      const response = await axios.get(repositoryURLTemplate({
-        base: this.base(),
-        owner: this.owner(),
-      }), {headers: this.headers()});
-  
-      const repo: any = _.head(_.filter(response.data.repositories, (repo) => repo.name === this.repository()));
+      const response = await axios.get(
+        repositoryURLTemplate({
+          base: this.base(),
+          owner: this.owner()
+        }),
+        { headers: this.headers() }
+      );
+
+      const repo: any = _.head(_.filter(response.data.repositories, repo => repo.name === this.repository()));
       this._repositoryId = repo.id;
       return repo;
-    }
-    catch (e) {
+    } catch (e) {
       console.error(e);
       return {};
     }
@@ -139,8 +143,7 @@ export class ActiveRepositorySingleton {
       this.setToken(newToken);
       commands.executeCommand('theTravisClient.refresh');
       window.showInformationMessage('You successfully added token, loading repositories wait a moment.');
-    }
-    else {
+    } else {
       window.showWarningMessage('You failed to add token, try again (Shift + CMD + P) travis set token');
     }
   }
@@ -153,34 +156,38 @@ export class ActiveRepositorySingleton {
         interval = _.isNumber(_.toNumber(interval)) ? _.toNumber(interval) : 5;
         this._timeInterval = interval * 60000;
       }
-  
+
       if (!this._owner) {
         // check owner is added in configuration
         this._owner = workspace.getConfiguration('travisClient').get<string>('owner');
       }
-  
+
       // get repository name and owner name from git info
       if (_.isEmpty(this._owner) || !this._repository) {
         [this._owner, this._repository] = setRepositoryDetails(repoPath);
         this.getRepositoryIdFromTravis();
       }
-  
+
       if (!this._branch) {
         Git.branch(this._path, (err: never, activeBranch: string) => {
           this._branch = activeBranch;
         });
       }
-    
-      if (this._isTravisProject === undefined && ActiveRepositorySingleton && ActiveRepositorySingleton.isTravisProject()) {
+
+      if (
+        this._isTravisProject === undefined &&
+        ActiveRepositorySingleton &&
+        ActiveRepositorySingleton.isTravisProject()
+      ) {
         this._isTravisProject = ActiveRepositorySingleton.isTravisProject();
       }
-  
+
       if (!this._accountType) {
         this._accountType = ActiveRepositorySingleton && ActiveRepositorySingleton.getAccountType();
       }
-  
+
       if (!this._base || !this._token || !this._storageKey) {
-        const {base, token, storageKey} = this.getProjectDetails(this.context);
+        const { base, token, storageKey } = this.getProjectDetails(this.context);
         this._base = base;
         this.setToken(token);
         this._storageKey = storageKey;
@@ -200,7 +207,7 @@ export class ActiveRepositorySingleton {
       this.setDetails(this._path);
       this.getRepositoryIdFromTravis();
     }
-    return this._repository; 
+    return this._repository;
   }
 
   private branch() {
@@ -248,7 +255,6 @@ export class ActiveRepositorySingleton {
     }
     return this._repositoryId;
   }
-
 }
 
 function setRepositoryDetails(repoPath: string) {
@@ -266,13 +272,11 @@ function setRepositoryDetails(repoPath: string) {
       }
       const split = _.split(repo, '/');
       return split && split.length > 1 ? split : ['', ''];
-    }
-    catch (e) {
+    } catch (e) {
       window.showErrorMessage('Make sure that git is configured properly.!');
       return ['', ''];
     }
-  }
-  else {
+  } else {
     return ['', ''];
   }
 }

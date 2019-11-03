@@ -58,61 +58,79 @@ This extension contributes the following settings:
 
 For example:
 
-  ```json
-    "travisClient.owner": "lakkanna",
-    "travisClient.branches": ["master", "sprint"],
-    "travisClient.pro": true,
-    "travisClient.interval": 6
-  ```
+```json
+  "travisClient.owner": "lakkanna",
+  "travisClient.branches": ["master", "sprint"],
+  "travisClient.pro": true,
+  "travisClient.interval": 6
+```
 
 ### Note: If `travisClient.pro` is enabled, should add enterprise api-token.
 
-### `If you have any questions feel free to shoot an email: ` lakkannawalikar@gmail.com
+### `If you have any questions feel free to shoot an email:` lakkannawalikar@gmail.com
 
 ## Release Notes
 
 ### 0.0.1
+
 - Get all repositories from https://travis-ci.org
 - Get branches for all repositories
 - Get build status for all branches
 
 ### 0.0.2
+
 - Added Keywords in package.json
 
 ### 0.0.3
+
 - Added Travis Enterprise account (for private repository access)
 
 ### 0.0.4
+
 - Check is travis project
 - Auto refresh on configuration changes in **settings.json**
 - Reasonable error messages
 
 ### 0.0.5
+
 - Added status bar item to show active repositories, active branch last build status
 
 ### 0.0.6
+
 - Fixed activation events
 
 ### 0.0.7
+
 - Fixed extension activation problem
 
 ### 0.0.8
+
 - Added auto refresh, refresh after time interval _(unit: minutes)_, default interval is 5 minutes
 
 ### 0.0.9
+
 - Updated devDependencies reason _(axios)_ vulnerability.
 
 ### 0.1.0
-- Added individual build *Restart* and build *Cancel*
+
+- Added individual build _Restart_ and build _Cancel_
 
 ### 0.1.1
+
 - Fixed extension activation problem fixed
 
 ### 0.1.2
-- Fixed action (Restart/Cancel)  disabled for auth token error in view/context/item
+
+- Fixed action (Restart/Cancel) disabled for auth token error in view/context/item
 
 ### 0.1.3
+
 - Removed unused node_module packages and configured webpack
+
+### 0.1.4
+
+- theTravisClient command not found fixed, replaced workspace.rootPath by workspace.workspaceFolders
+
 ---
 
 ![feature 1](images/demo1.png)

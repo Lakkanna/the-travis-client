@@ -111,7 +111,7 @@
         "newlines-between": "never"
       }
     ],
-    "prettiest/no-block-after-closing": "error",
+    "prettiest/no-block-after-closing": "warn",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/explicit-member-accessibility": "off",
     "@typescript-eslint/no-empty-interface": "off",
