@@ -131,6 +131,10 @@ For example:
 
 - theTravisClient command not found fixed, replaced workspace.rootPath by workspace.workspaceFolders
 
+### 0.1.5
+
+- updated npm packages
+
 ---
 
 ![feature 1](images/demo1.png)

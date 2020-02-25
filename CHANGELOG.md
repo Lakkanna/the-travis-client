@@ -4,6 +4,10 @@
 
 - Add Pull requests build status
 
+## [0.1.5] - 2020-02-25
+
+- updated npm packages
+
 ## [0.1.4] - 2019-09-03
 
 ### Fixed
