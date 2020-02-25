@@ -71,7 +71,8 @@ export class ActiveRepositorySingleton {
       const conf = path.join(work.uri.path, '.travis.yml');
       try {
         return fs.statSync(conf).isFile();
-      } catch (err) {
+      }
+      catch (err) {
         return false;
       }
     }
@@ -110,7 +111,8 @@ export class ActiveRepositorySingleton {
       const repo: any = _.head(_.filter(response.data.repositories, repo => repo.name === this.repository()));
       this._repositoryId = repo.id;
       return repo;
-    } catch (e) {
+    }
+    catch (e) {
       console.error(e);
       return {};
     }
@@ -143,7 +145,8 @@ export class ActiveRepositorySingleton {
       this.setToken(newToken);
       commands.executeCommand('theTravisClient.refresh');
       window.showInformationMessage('You successfully added token, loading repositories wait a moment.');
-    } else {
+    }
+    else {
       window.showWarningMessage('You failed to add token, try again (Shift + CMD + P) travis set token');
     }
   }
@@ -272,11 +275,13 @@ function setRepositoryDetails(repoPath: string) {
       }
       const split = _.split(repo, '/');
       return split && split.length > 1 ? split : ['', ''];
-    } catch (e) {
+    }
+    catch (e) {
       window.showErrorMessage('Make sure that git is configured properly.!');
       return ['', ''];
     }
-  } else {
+  }
+  else {
     return ['', ''];
   }
 }
