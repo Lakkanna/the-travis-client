@@ -209,7 +209,7 @@
     "typescript": "3.8.2",
     "vscode": "1.1.36",
     "webpack": "4.41.6",
-    "webpack-cli": "3.3.11"
+    "webpack-cli": "3.3.12"
   },
   "dependencies": {
     "git-rev-2": "0.1.0"
